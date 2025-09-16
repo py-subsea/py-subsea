@@ -1969,13 +1969,14 @@ class GaussianSmoother:
             # Extract group data
             x_g = self.x[mask]
             y_g = self.y[mask]
-
+            arc_length_g = np.zeros_like(x_g)
+            arc_length_g[1:] = np.cumsum(np.sqrt(np.diff(x_g)**2 + np.diff(y_g)**2))
             # Initialize smoothed output
             y_smooth_g = np.empty_like(y_g, dtype=float)
             for i in range(x_g.size):
-                x_left = max(x_g[0], x_g[i] - 2 * b_scaled)
-                x_right = min(x_g[i] + 2 * b_scaled, x_g[-1])
-                idx = np.where((x_g >= x_left) & (x_g <= x_right))[0]
+                arc_left = max(arc_length_g[0], arc_length_g[i] - 2 * b_scaled)
+                arc_right = min(arc_length_g[i] + 2 * b_scaled, arc_length_g[-1])
+                idx = np.where((arc_length_g >= arc_left) & (arc_length_g <= arc_right))[0]
                 xgk = x_g[idx]
                 ygk = y_g[idx]
                 weight = (
