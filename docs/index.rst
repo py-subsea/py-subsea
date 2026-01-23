@@ -41,9 +41,9 @@ How to Contribute to the Project
   - If you have a contribution in mind, please add it in `Discussions <https://github.com/py-subsea/py-subsea/discussions>`_.
   - If you have identified an issue with the code, please add it in `Issues <https://github.com/py-subsea/py-subsea/issues>`_.
 
-******************************
+********************************
 PySubsea Python Library Versions
-******************************
+********************************
  THE REQUIREMENTS.txt file contains the libraries for which the script has been developed and shown to run.
 
  If some of libraries imported by PySubsea lead to issues, before running PySubsea for first time, follow these steps to activate a virtual environment from the REQUIREMENTS.TXT file:

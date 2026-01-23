@@ -5,3 +5,7 @@ __pycache__/
 
 # Ignore Sphinx Files
 docs/_build/
+
+# Python virtual environments
+env/
+.venv/
