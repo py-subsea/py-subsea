@@ -1209,7 +1209,7 @@ class OOSDespiker: # pylint: disable=too-many-arguments, too-many-instance-attri
             self.x_despike_mean_aligned[idx] = x_g_despiked_mean_aligned
             self.y_despike_mean_aligned[idx] = y_g_despiked_mean_aligned
 
-    def get_x_y_despike_median_algined(self):
+    def get_x_y_despike_median_aligned(self):
         """
         Get the despiked y values (i.e., northings or curvatures) for each survey point.
         Within the rolling window, the starting point is translated to the origin, and the line
@@ -1835,6 +1835,50 @@ class FFTSmoother: # pylint: disable=too-many-arguments, too-many-instance-attri
             Raw FFT values for each survey point.
         """
         return self.fft_raw
+
+    def get_psd_development(self):
+        """
+        Get the PSD development arrays.
+
+        Returns
+        -------
+        list
+            PSD development arrays for each group.
+        """
+        return self.psd_development
+
+    def get_psd_survey_type(self):
+        """
+        Get the PSD survey type arrays.
+
+        Returns
+        -------
+        list
+            PSD survey type arrays for each group.
+        """
+        return self.psd_survey_type
+
+    def get_psd_pipeline_group(self):
+        """
+        Get the PSD pipeline group arrays.
+
+        Returns
+        -------
+        list
+            PSD pipeline group arrays for each group.
+        """
+        return self.psd_pipeline_group
+
+    def get_psd_group_section_type(self):
+        """
+        Get the PSD group section type arrays.
+
+        Returns
+        -------
+        list
+            PSD group section type arrays for each group.
+        """
+        return self.psd_group_section_type
 
     def get_psd_freqs(self):
         """

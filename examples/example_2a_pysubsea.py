@@ -5,11 +5,11 @@ import itertools
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-import refpy
+import pysubsea as ss
 
 def data():
     """
-    Example workflow for OOS pipeline survey and route data processing using refpy.
+    Example workflow for OOS pipeline survey and route data processing using ss.
 
     This function demonstrates:
     - Importing route and survey data from Excel files.
@@ -35,7 +35,7 @@ def data():
         dfs['Pipeline'].isin(PIPELINE)
     ]
     # Initialise OOS anonymisation class
-    oos = refpy.OOSAnonymisation(
+    oos = ss.OOSAnonymisation(
         route_development=dfr['Development'],
         survey_type=dfs['Survey Type'],
         route_pipeline_group=dfr['Pipeline Group'],
@@ -68,16 +68,17 @@ def data():
         'Actual Route Curve Radius': oos.get_survey_actual_route_curve_radius()
     })
     # Initialise and run the despiking class
-    despike = refpy.OOSDespiker(
+    despike = ss.OOSDespiker(
         development = df1['Development'],
         survey_type = df1['Survey Type'],
         pipeline_group = df1['Pipeline Group'],
         group_section_type = df1['Section Type'],
+        x = df1['Easting Mod'],
         y = df1['Northing Mod'],
-        window = 100,
-        sigma = 1.5
+        window = 100
     )
-    df1['Northing Mod - Despike'] = despike.get_y_despike_nan()
+    df1['Easting Mod - Despike'] = despike.get_x_y_despike_median_aligned()[0]
+    df1['Northing Mod - Despike'] = despike.get_x_y_despike_median_aligned()[1]
     # Anonymised survey
     oos.process(anonymise=True)
     df2 = pd.DataFrame({
@@ -100,19 +101,20 @@ def data():
         'Group Northing Mod': oos.get_survey_group_section_northing_mod()
     })
     # Initialise and run the despiking class
-    despike = refpy.OOSDespiker(
+    despike = ss.OOSDespiker(
         development = df2['Development'],
         survey_type = df2['Survey Type'],
         pipeline_group = df2['Pipeline Group'],
         group_section_type = df2['Group Section Type'],
+        x = df2['Group Easting Mod'],
         y = df2['Group Northing Mod'],
-        window = 11,
-        sigma = 3.0
+        window = 11
     )
     # Run the despiking process
-    df2['Group Northing Mod - Despike'] = despike.get_y_despike_nan()
+    df2['Group Easting Mod - Despike'] = despike.get_x_y_despike_median_aligned()[0]
+    df2['Group Northing Mod - Despike'] = despike.get_x_y_despike_median_aligned()[1]
     # Initialise the OOS curvature class
-    curvature = refpy.OOSCurvature(
+    curvature = ss.OOSCurvature(
         development = df2['Development'],
         survey_type = df2['Survey Type'],
         pipeline_group = df2['Pipeline Group'],
@@ -125,7 +127,7 @@ def data():
     df2['Group Angle'] = curvature.get_angle()
     df2['Group Curvature'] = curvature.get_curvature()
     # Initialise and run FFT smoothing class - Coordinates
-    fft_smooth = refpy.FFTSmoother(
+    fft_smooth = ss.FFTSmoother(
         development = df2['Development'],
         survey_type = df2['Survey Type'],
         pipeline_group = df2['Pipeline Group'],
@@ -149,7 +151,7 @@ def data():
         'Coordinate - PSD': fft_smooth.get_psd_vals(),
     })
     # Initialise FFT smoothing class - Curvatures
-    fft_smooth = refpy.FFTSmoother(
+    fft_smooth = ss.FFTSmoother(
         development = df2['Development'],
         survey_type = df2['Survey Type'],
         pipeline_group = df2['Pipeline Group'],
@@ -169,7 +171,7 @@ def data():
     df2['Group FFT Smooth Curvature - Easting Mod'] = fft_smooth.get_x_recon()
     df2['Group FFT Smooth Curvature - Northing Mod'] = fft_smooth.get_y_recon()
     # Initialise Gaussian smoothing class
-    gaussian_smooth = refpy.GaussianSmoother(
+    gaussian_smooth = ss.GaussianSmoother(
         development = df2['Development'],
         survey_type = df2['Survey Type'],
         pipeline_group = df2['Pipeline Group'],
