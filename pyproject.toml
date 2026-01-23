@@ -10,13 +10,8 @@ readme = "README.md"
 readme-content-type = "text/markdown"
 requires-python = ">=3.10"
 license = { text = "MIT" }
-authors = [
-    { name = "Ismael Ripoll", email = "ismael.ripoll@subseaenergies.com" }
-]
-dependencies = [
-    # "numpy>=1.24",
-    # "pandas>=2.0",
-]
+authors = [{ name = "Ismael Ripoll", email = "ismael.ripoll@subseaenergies.com" }]
+dependencies = []
 
 keywords = ["subsea", "pipeline", "FEM", "Python", "engineering"]
 classifiers = [
