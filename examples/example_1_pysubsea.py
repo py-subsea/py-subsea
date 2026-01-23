@@ -2,11 +2,11 @@
 Example script
 '''
 import pandas as pd
-import refpy
+import pysubsea as pss
 
 def data():
     """
-    Example workflow for pipeline design calculations using refpy.
+    Example workflow for pipeline design calculations using Py-Subsea.
 
     This function demonstrates:
     - Importing design data from an Excel file.
@@ -28,7 +28,7 @@ def data():
     df = df[1:].reset_index(drop=True)
 
     # Example of pipe properties calculation
-    pipe = refpy.Pipe(
+    pipe = pss.Pipe(
         outer_diameter = df['Outer Diameter'],
         wall_thickness = df['Wall Thickness'],
         corrosion_allowance = df['Corrosion Allowance'],
@@ -37,7 +37,7 @@ def data():
     df['Total Outer Diameter'] = pipe.total_outer_diameter()
 
     # Example of DNV limit state calculation
-    dnv = refpy.DNVLimitStates(
+    dnv = pss.DNVLimitStates(
         outer_diameter = df['Outer Diameter'],
         corroded_wall_thickness = df['Corroded Wall Thickness'],
         material = df['Material'],
@@ -49,7 +49,7 @@ def data():
     df['Burst Pressure'] = dnv.burst_pressure()
 
     # Example of PSI calculation
-    psi = refpy.PSI(
+    psi = pss.PSI(
         total_outer_diameter = df['Total Outer Diameter'],
         surface_roughness = df['Surface Roughness'],
         density = df['Density'],
@@ -61,7 +61,7 @@ def data():
     df['Vertical Bearing Capacity Arrays'] = list(vertical_bearing_capacity_arrays)
 
     # Example of lateral buckling calculation
-    lb = refpy.LBDistributions(
+    lb = pss.LBDistributions(
         friction_factor_le = df['Lateral Friction Factor - LE'],
         friction_factor_be = df['Lateral Friction Factor - BE'],
         friction_factor_he = df['Lateral Friction Factor - HE'],
@@ -84,7 +84,7 @@ def data():
 ### Example 1
 ###
 dfe1 = data()
-dfe1 = dfe1.transpose()
-new_cols = [f'Sensitivity{i}' for i in range(1, dfe1.shape[1]+1)]
-dfe1.columns = new_cols[:dfe1.shape[1]]
-dfe1.to_csv('example_1_output.csv')
+# dfe1 = dfe1.transpose()
+# new_cols = [f'Sensitivity{i}' for i in range(1, dfe1.shape[1]+1)]
+# dfe1.columns = new_cols[:dfe1.shape[1]]
+# dfe1.to_csv('example_1_output.csv')

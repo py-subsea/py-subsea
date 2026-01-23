@@ -1,12 +1,12 @@
 from setuptools import setup, find_packages
 
 setup(
-    name="refpy",
-    version="0.1.26",
+    name="pysubsea",
+    version="0.1.1",
     description="Package for subsea pipelines and risers design in Python",
     long_description=open('README.md').read(),
     long_description_content_type='text/markdown',
-    url="https://github.com/refpy/refpy",
+    url="https://github.com/py-subsea/py-subsea",
     author="ismael-ripoll",
     license="MIT License",
     classifiers=[
@@ -18,8 +18,8 @@ setup(
     python_requires='>=3.10',
     install_requires=[],
     project_urls={
-        "Documentation": "https://refpy.github.io/refpy",
-        "Source": "https://github.com/refpy/refpy",
-        "Tracker": "https://github.com/refpy/refpy/issues",
+        "Documentation": "https://py-subsea.github.io/py-subsea/",
+        "Source": "https://github.com/py-subsea/py-subsea",
+        "Tracker": "https://github.com/py-subsea/py-subsea/issues",
     }
 )

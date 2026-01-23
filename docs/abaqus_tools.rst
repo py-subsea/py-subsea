@@ -1,7 +1,7 @@
 Abaqus Tools
 ============
 
-.. automodule:: refpy.abaqus_tools
+.. automodule:: pysubsea.abaqus_tools
    :members:
    :undoc-members:
    :show-inheritance:

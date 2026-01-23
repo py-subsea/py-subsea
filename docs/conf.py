@@ -3,7 +3,7 @@ import sys
 
 sys.path.insert(0, os.path.abspath("../"))
 
-project = 'RefPy'
+project = 'PySubsea'
 copyright = '2025, Ismael Ripoll'
 author = 'Ismael Ripoll'
 release = 'v0.1'
@@ -35,7 +35,7 @@ html_sidebars = {
     "**": ["search-field", "sidebar-nav-bs"]  # Show the sidebar and search field everywhere
 }
 
-html_baseurl = 'https://refpy.github.io/refpy/'
+html_baseurl = 'https://py-subsea.github.io/py-subsea/'
 
 html_show_sourcelink = False
 
@@ -49,7 +49,7 @@ html_theme_options = {
     "icon_links": [                    # Icons in the top bar (e.g., GitHub)
         {
             "name": "GitHub",
-            "url": "https://refpy.github.io/refpy/",
+            "url": "https://py-subsea.github.io/py-subsea/",
             "icon": "fab fa-github",
         },
     ],

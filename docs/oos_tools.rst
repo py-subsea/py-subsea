@@ -1,7 +1,7 @@
 OOS Tools
 =========
 
-.. automodule:: refpy.oos_tools
+.. automodule:: pysubsea.oos_tools
    :members:
    :undoc-members:
    :show-inheritance:

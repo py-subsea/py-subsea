@@ -10,9 +10,9 @@ API Reference
 Description
 ***********
 
- Welcome to the RefPy API Reference. This section provides a detailed overview of the core modules,  classes, functions, and methods available within RefPy. Whether you are integrating RefPy into your  workflow or extending its capabilities, this guide will help you understand how to effectively utilize the  library's features.
+ Welcome to the PySubsea API Reference. This section provides a detailed overview of the core modules, classes, functions, and methods available within PySubsea. Whether you are integrating PySubsea into your workflow or extending its capabilities, this guide will help you understand how to effectively utilize the library's features.
  
- Each entry includes descriptions of parameters, return types, and usage examples where applicable, to  support you in getting the most out of RefPy. For further assistance or to discuss usage patterns, please  refer to the project's  `Discussions <https://github.com/refpy/refpy/discussions>`_ page.
+ Each entry includes descriptions of parameters, return types, and usage examples where applicable, to support you in getting the most out of PySubsea. For further assistance or to discuss usage patterns, please  refer to the project's  `Discussions <https://github.com/py-subsea/py-subsea/discussions>`_ page.
 
 **********
 References

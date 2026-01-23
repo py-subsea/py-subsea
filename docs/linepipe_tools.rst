@@ -1,7 +1,7 @@
 Linepipe Tools
 ==============
 
-.. automodule:: refpy.linepipe_tools
+.. automodule:: pysubsea.linepipe_tools
    :members:
    :undoc-members:
    :show-inheritance:

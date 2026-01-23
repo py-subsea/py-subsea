@@ -1,7 +1,7 @@
 Lateral Buckling Tools
 ======================
 
-.. automodule:: refpy.lateral_buckling_tools
+.. automodule:: pysubsea.lateral_buckling_tools
    :members:
    :undoc-members:
    :show-inheritance:

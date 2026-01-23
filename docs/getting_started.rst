@@ -6,11 +6,11 @@ Getting Started
 
    <hr style="height:6px; background-color:#888; border:none; margin:1.5em 0;" />
 
-***********************************
-About RefPy: A Foundational Library
-***********************************
+**************************************
+About PySubsea: A Foundational Library
+**************************************
 
-RefPy is designed as a foundational library for pipeline and riser design. A foundational library provides core building blocks and reusable components that can be used directly in your own scripts, applications, or larger frameworks. It is not a standalone application, but rather a toolkit that enables rapid development and robust analysis by providing well-tested, well-documented, and efficient functions and classes.
+PySubsea is designed as a foundational library for pipeline and riser design. A foundational library provides core building blocks and reusable components that can be used directly in your own scripts, applications, or larger frameworks. It is not a standalone application, but rather a toolkit that enables rapid development and robust analysis by providing well-tested, well-documented, and efficient functions and classes.
 
 What is a Foundational Library?
 -------------------------------
@@ -22,10 +22,10 @@ A foundational library is a collection of essential tools and abstractions that 
 - Focused on core functionality, not user interfaces
 - Designed for integration into other projects
 
-Current Modules in RefPy
-------------------------
+Current Modules in PySubsea
+---------------------------
 
-RefPy currently includes the following modules:
+PySubsea currently includes the following modules:
 
 - ``linepipe_tools.py``: Provides the ``Pipe`` class for geometric and material property calculations of pipeline sections, including diameters, areas, stiffness, and moments of inertia.
 - ``dnv_tools.py``: Contains classes and functions for DNV pipeline code calculations, including general utilities and limit state checks (``DNVGeneral``, ``DNVLimitStates``).
@@ -40,11 +40,11 @@ Each module is designed to be imported and used independently or in combination,
 
    <hr style="height:6px; background-color:#888; border:none; margin:1.5em 0;" />
 
-*************************
-Testing the RefPy Package
-*************************
+****************************
+Testing the PySubsea Package
+****************************
 
-The repository includes a file called ``test_refpy.py`` that provides automated testing for the main classes and methods in RefPy. This script is designed to help you verify that your installation and code changes are working as expected.
+The repository includes a file called ``test_pysubsea.py`` that provides automated testing for the main classes and methods in PySubsea. This script is designed to help you verify that your installation and code changes are working as expected.
 
 How to Run the Tests
 --------------------
@@ -53,12 +53,12 @@ To run all tests, simply execute the following command in your terminal from the
 
 .. code-block:: bash
 
-   $ python test_refpy.py
+   $ python test_pysubsea.py
 
 What Does It Test?
 ------------------
 
-The ``test_refpy.py`` script will automatically run doctests for the following classes:
+The ``test_pysubsea.py`` script will automatically run doctests for the following classes:
 
 - ``Pipe``
 - ``DNVGeneral``
@@ -78,7 +78,7 @@ This makes it easy to check that all core functionality is working as intended a
 Running Example Scripts
 ***********************
 
-The repository also includes three files called ``example_1_refpy.py``, ``example_2_refpy.py`` and ``example_3_refpy.py`` that demonstrates how to use the main features of RefPy with real input data. This script is a practical starting point for new users.
+The repository also includes three files called ``example_1_pysubsea.py``, ``example_2_pysubsea.py`` and ``example_3_pysubsea.py`` that demonstrates how to use the main features of PySubsea with real input data. This script is a practical starting point for new users.
 
 How to Run the Example
 ----------------------
@@ -87,15 +87,15 @@ To run the example scripts, execute the following commands in your terminal from
 
 .. code-block:: bash
 
-   $ python example_1_refpy.py
-   $ python example_2a_refpy.py
-   $ python example_2b_refpy.py
-   $ python example_3_refpy.py
+   $ python example_1_pysubsea.py
+   $ python example_2a_pysubsea.py
+   $ python example_2b_pysubsea.py
+   $ python example_3_pysubsea.py
 
 What Does It Demonstrate?
 -------------------------
 
-**The ``example_1_refpy.py`` script contains examples to demonstrate:**
+**The ``example_1_pysubsea.py`` script contains examples to demonstrate:**
 
 Pipe, DNV, PSI, LBDistributions Example: Demonstrates how to create and use the ``Pipe``, ``DNVLimitStates``, ``PSI``, ``LBDistributions`` classes for pipeline property calculations.
 
@@ -106,7 +106,7 @@ Pipe, DNV, PSI, LBDistributions Example: Demonstrates how to create and use the 
 
    Example 1: Pipe, DNV, PSI and LB Calculations
 
-**The ``example_2a_refpy.py`` script contains examples to show:**
+**The ``example_2a_pysubsea.py`` script contains examples to show:**
 
 OOS Example: Shows how to use the ``OOSAnonymisation``, ``OOSDespiker``, ``OOSCurvature``, ``FFTSmoother``, ``GaussianSmoother`` classes for group-wise signal processing and survey data anonymisation.
 
@@ -150,7 +150,7 @@ OOS Example: Shows how to use the ``OOSAnonymisation``, ``OOSDespiker``, ``OOSCu
 
    Example 2a, Plot 5: Spectral Analysis - Curvatures. This plot visualises the radius of curvature distribution of the survey data, highlighting the noise associated with the survey curvatures.
 
-**The ``example_2b_refpy.py`` script contains examples to show:**
+**The ``example_2b_pysubsea.py`` script contains examples to show:**
 
 OOS Example - Syntetic Signal: Shows how to use the ``OOSDespiker``, ``OOSCurvature``, ``FFTSmoother``, ``GaussianSmoother`` classes and also shows that works as intended for a syntetic signal.
 
@@ -189,7 +189,7 @@ OOS Example - Syntetic Signal: Shows how to use the ``OOSDespiker``, ``OOSCurvat
 
    Example 2b, Plot 5: Spectral Analysis - Curvatures. This plot visualises the radius of curvature distribution of the syntetic signal, highlighting the noise associated with the syntetic signal curvatures.
 
-**The ``example_3_refpy.py`` script contains examples to illustrate:**
+**The ``example_3_pysubsea.py`` script contains examples to illustrate:**
 
 AbaqusPy Example: Illustrates how to use the ``AbaqusPy`` class for generating Abaqus input files with sensitivity analysis.
 

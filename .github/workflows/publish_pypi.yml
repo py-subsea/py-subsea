@@ -6,7 +6,7 @@ on:
       - main
     paths:
       - 'setup.py'
-      - 'refpy/**'   # adjust to your package folder
+      - 'pysubsea/**'   # adjust to your package folder
   workflow_dispatch:        # allows manual trigger
 
 jobs:
