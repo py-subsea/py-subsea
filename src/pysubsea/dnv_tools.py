@@ -11,6 +11,7 @@ properties.
   pipelines according to DNV standards.
 - Designed for use in subsea pipeline and riser engineering, but general enough for any DNV-based
   pipeline property calculations.
+
 All calculations are vectorized using NumPy for efficiency and flexibility.
 
 .. raw:: html
