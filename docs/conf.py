@@ -4,9 +4,9 @@ import sys
 sys.path.insert(0, os.path.abspath("../src"))
 
 project = 'PySubsea'
-copyright = '2025, Subsea Energies'
+copyright = '2026, Subsea Energies'
 author = 'Subsea Energies'
-release = 'v0.1.3'
+release = 'v0.1.4'
 
 extensions = [
     'sphinx.ext.todo',
