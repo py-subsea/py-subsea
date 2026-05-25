@@ -14,7 +14,7 @@ Project Philosophy
 
  The project follows a corporate open-source approach focused on collaboration, experimentation, and the systematic compilation of engineering knowledge. **PySubsea** is maintained independently from client-specific or confidential work; instead, it serves as a shared engineering tool that captures practical insights in an open and reusable framework.
 
- The repository is publicly available to encourage collaboration and knowledge sharing across the subsea industry, while ensuring that all proprietary or conditential information is excluded. By making the project open, colleagues and the wider community can review it, contribute to it, and build upon it, allowing the repository to continue improving beyond its original scope.
+ The repository is publicly available to encourage collaboration and knowledge sharing across the subsea industry, while ensuring that all proprietary or conditential information is excluded. By making the project open, the wider community can review it, contribute to it, and build upon it, allowing the repository to continue improving beyond its original scope.
  
   - PySubsea has made available with the intend of allowing the community to review, expand and use it under a `MIT License <https://github.com/py-subsea/py-subsea/blob/main/LICENSE>`_. The MIT license is one of the most permissive open-source licenses, allowing broad reuse and modification with minimal restrictions.
 
