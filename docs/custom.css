@@ -19,3 +19,5 @@ dl.function + dl.function {
     margin-top: 20px;               /* Add space above the line */
     padding-top: 10px;              /* Add space below the line */
 }
+
+a.reference.external strong { font-weight: 700; }
