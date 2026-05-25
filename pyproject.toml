@@ -4,12 +4,12 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pysubsea"
-version = "0.1.2"
+version = "0.1.3"
 description = "Package for subsea pipelines and risers design in Python"
 readme = { file = "README.md", content-type = "text/markdown" }
 requires-python = ">=3.10"
 license = { text = "MIT" }
-authors = [{ name = "Ismael Ripoll", email = "ismael.ripoll@subseaenergies.com" }]
+authors = [{ name = "Subsea Energies", email = "open.source@subseaenergies.com" }]
 dependencies = []
 
 keywords = ["subsea", "pipeline", "FEM", "Python", "engineering"]

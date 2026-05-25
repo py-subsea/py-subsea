@@ -2,13 +2,12 @@
 
 PySubsea is a package for the design of subsea pipelines and risers in Python.
 
-PySubsea is a personal project developed by Ismael Ripoll to consolidate and automate tasks frequently encountered in his daily engineering routine, with the aim of having them version-controlled and accessible through a structured repository.
+It was initiated and is developed by `Subsea Energies <https://www.subseaenergies.com>`_ to consolidate and automate tasks frequently encountered in subsea engineering workflows, ensuring they remain version-controlled and accessible within a structured repository.
 
-The development and usage of PySubsea are strictly limited to personal, non-commercial use, with a focus on training, experimentation, and the structured compilation of knowledge. This project is maintained independently and does not relate to or interfere with Ismael's professional responsibilities as an employee. It serves as a personal learning tool and a way to consolidate practical insights outside the scope of his employment.
+ The project follows a corporate open-source approach focused on collaboration, experimentation, and the systematic compilation of engineering knowledge. **PySubsea** is maintained independently from client-specific or confidential work; instead, it serves as a shared engineering tool that captures practical insights in an open and reusable framework.
 
-The repository has been made publicly accessible to encourage collaboration and knowledge sharing among colleagues, while maintaining that all proprietary or confidential information remains excluded. It has been made available to allow colleagues to review, build upon, and make use of it in a collaborative and open manner, in the hope that this may give the repository a chance to continue improving beyond its original scope.
+The repository is publicly available to encourage collaboration and knowledge sharing across the subsea industry, while ensuring that all proprietary or conditential information is excluded. By making the project open, colleagues and the wider community can review it, contribute to it, and build upon it, allowing the repository to continue improving beyond its original scope.
 
-* Website: https://www.py-subsea.org
 * Documentation: https://py-subsea.github.io/py-subsea
 * Source code: https://github.com/py-subsea/py-subsea
 * Bug reports: https://github.com/py-subsea/py-subsea/issues
