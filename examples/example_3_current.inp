@@ -1,0 +1,47 @@
+<py
+    ####################################################################
+    ## Import Main Python Modules                                     ##
+    ####################################################################
+    import pandas as pd
+    import numpy as np
+
+    ####################################################################
+    ## Import Input Data                                              ##
+    ####################################################################
+    pipe_df = pd.read_excel('example_3.xlsx', sheet_name = 'Linepipe')
+    pipe_df = pipe_df.transpose()
+    pipe_df.columns = pipe_df.loc['Property']
+
+    inputs = pipe_df.iloc[-1].squeeze()
+    inputs['orad'] = inputs['od'] / 2.0
+py>
+************************************************************************
+**                                                Heading and Restart **
+************************************************************************
+*HEADING
+Test
+************************************************************************
+**                                                   Model Parameters **
+************************************************************************
+*PARAMETER
+<py
+    for key, value in inputs.items():
+        if not isinstance(value, str) and np.isscalar(value) and not np.isnan(value):
+            $ {key} = {value}
+py>
+************************************************************************
+**                                                 Element Properties **
+************************************************************************
+*BEAM SECTION, ELSET = elset_pipe, MATERIAL=mat_steel, SECTION=THICK PIPE
+ $ {inputs['orad']}, {inputs['wt']}
+
+ 3, 16
+************************************************************************
+**                                               Material Definitions **
+************************************************************************
+*MATERIAL, NAME=mat_steel
+*ELASTIC
+ <young>, <poisson>
+*EXPANSION
+ <alpha>
+**

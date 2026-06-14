@@ -1,0 +1,4 @@
+*PARAMETER
+a = 1.5
+*TEST
+[1, 2]

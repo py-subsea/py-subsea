@@ -16,23 +16,25 @@ Project Philosophy
 
  The repository is publicly available to encourage collaboration and knowledge sharing across the subsea industry, while ensuring that all proprietary or conditential information is excluded. By making the project open, the wider community can review it, contribute to it, and build upon it, allowing the repository to continue improving beyond its original scope.
  
-  - PySubsea has made available with the intend of allowing the community to review, expand and use it under a `MIT License <https://github.com/py-subsea/py-subsea/blob/main/LICENSE>`_. The MIT license is one of the most permissive open-source licenses, allowing broad reuse and modification with minimal restrictions.
+  - **PySubsea** is completely free to use under the `MIT License <https://github.com/py-subsea/py-subsea/blob/main/LICENSE>`_, including for users who only want to run the code without modifying it. The MIT License allows anyone to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the software with minimal restrictions.
 
-  - Source code: The source code is saved in `GitHub <https://github.com/py-subsea/py-subsea>`_.
+  - **PySubsea** is also open to contributions from users who want to add features, fix bugs, or improve documentation.
 
-  - PyPi Wheel: A downloadable wheel of PySubsea is found in `PyPi <https://pypi.org/project/py-subsea>`_. To install PySubsea, execute pip install pysubsea in a command terminal.
+  - **Source code**: The source code is available on `GitHub <https://github.com/py-subsea/py-subsea>`_.
+
+  - **PyPI Wheel**: The available wheel is on `PyPI <https://pypi.org/project/py-subsea>`_. Install with ``pip install pysubsea``.
 
 *******************
 Coorporate Partners
 *******************
 
- The management of this open-source project is carried out by `Subsea Energies <https://github.com/subsea-energies>`_, the project sponsor and current maintainer.
+ The management of this open-source project is carried out by `Subsea Energies <https://www.subseaenergies.com>`_, the project sponsor and current maintainer.
 
- While PySubsea is currently a led under a corporate open-source approach by Subsea Energies, the project is hosted under the dedicated PySubsea GitHub organisation rather than an individual account.
+ While **PySubsea** is currently a led under a corporate open-source approach by `Subsea Energies <https://www.subseaenergies.com>`_, the project is hosted under the dedicated  **PySubsea** GitHub organisation rather than an individual account.
  
  Although there is no immediate intention to formally announce or release the project or expand the team, the organisational setup allows for scalable and well-governed collaboration should it occur.
 
- PySubsea is also open to new sponsorship opportunities. Support may be provided either through funding or by contributing engineering resources. Such partnerships help ensure the project's continued growth, stability, and long-term sustainability. Organisations interested in sponsoring the project are encouraged to contact the PySubsea maintainers through the GitHub organisation.
+ **PySubsea** is also open to new sponsorship opportunities. Support may be provided either through funding or by contributing engineering resources. Such partnerships help ensure the project's continued growth, stability, and long-term sustainability. Organisations interested in sponsoring the project are encouraged to contact `Subsea Energies <https://www.subseaenergies.com>`_ at `info@subseaenergies.com <mailto:info@subseaenergies.com>`_.
 
 ********************************
 How to Contribute to the Project

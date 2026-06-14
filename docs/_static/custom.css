@@ -1,0 +1,76 @@
+/* Light mode (default) styles */
+dl.function > dt {
+    background-color: rgba(243, 207, 149, 0.5); /* Light yellow with transparency */
+    padding: 5px;
+    border-radius: 3px;
+}
+
+/* Dark mode styles */
+@media (prefers-color-scheme: dark) {
+    dl.function > dt {
+        background-color: rgba(243, 207, 149, 0.7); /* Darker yellow with more opacity */
+        color: #fff;  /* Change text color to white for better contrast */
+    }
+}
+
+/* Add a horizontal line between function blocks */
+dl.function + dl.function {
+    border-top: 1px solid #cccccc;  /* Light grey line between functions */
+    margin-top: 20px;               /* Add space above the line */
+    padding-top: 10px;              /* Add space below the line */
+}
+
+a.reference.external strong { font-weight: 700; }
+
+/* Increase total page width so center content doesn't get squeezed */
+@media (min-width: 1200px) {
+  .bd-page-width {
+    max-width: 110rem; /* try 110rem to 130rem */
+  }
+
+  .bd-main .bd-content .bd-article-container,
+  .bd-main .bd-content .bd-article {
+    max-width: none;
+  }
+}
+
+/* Adjust sidebar widths for larger screens */
+@media (min-width: 992px) {
+.bd-sidebar-primary {
+width: 20rem;
+max-width: 20rem;
+flex: 0 0 20rem;
+}
+
+#pst-secondary-sidebar.bd-sidebar-secondary {
+width: 32rem;
+max-width: 32rem;
+flex: 0 0 32rem;
+}
+}
+
+@media (min-width: 1200px) {
+.bd-page-width {
+max-width: 120rem;
+}
+
+.bd-main .bd-content .bd-article-container,
+.bd-main .bd-content .bd-article {
+max-width: none;
+}
+}
+
+/* Wrap long entries in right TOC */
+.bd-toc-nav .nav-link {
+white-space: normal !important;
+overflow-wrap: anywhere !important;
+word-break: break-word !important;
+}
+
+.bd-toc-nav .nav-link .pre,
+.bd-toc-nav .nav-link code,
+.bd-toc-nav .nav-link .docutils {
+white-space: normal !important;
+overflow-wrap: anywhere !important;
+word-break: break-word !important;
+}

@@ -1,7 +1,7 @@
 Pipe-Soil Interaction Tools
 ===========================
 
-.. automodule:: pysubsea.pipe_soil_interaction_tools
+.. autoclass:: pysubsea.pipe_soil_interaction_tools.PSI
    :members:
    :undoc-members:
    :show-inheritance:

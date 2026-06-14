@@ -1,9 +1,3 @@
-**\start_python_global
-import pandas as pd
-import numpy as np
-global param
-param = dict()
-**\end_python_global
 ************************************************************************
 **                                                Heading and Restart **
 ************************************************************************
@@ -12,33 +6,18 @@ Test
 ************************************************************************
 **                                                   Model Parameters **
 ************************************************************************
-**\start_python
-    ####################################################################
-    ##                                              Import Input Data ##
-    ####################################################################
-
-    df_pipe = pd.read_excel('example_3.xlsx', sheet_name = 'Linepipe')
-
-    df_pipe = df_pipe.transpose()
-    df_pipe.columns = df_pipe.loc['Property']
-    df_pipe = df_pipe.iloc[-1].squeeze()  
-
-    param['sensitivity'] = PARAM_sens
-    param['od']          = df_pipe['od']
-    param['wt']          = df_pipe['wt']
-    param['young']       = df_pipe['young']
-    param['poisson']     = df_pipe['poisson']
-    param['alpha']       = df_pipe['alpha']
-
-    writeLine += '*PARAMETER\n'
-    for key in param.keys():
-        writeLine += f'{key} = {str(param[key])}\n'
-**\end_python
+*PARAMETER
+ od = 0.182
+ wt = 0.0148
+ young = 207000000000.0
+ poisson = 0.3
+ alpha = 1.17e-05
+ orad = 0.091
 ************************************************************************
 **                                                 Element Properties **
 ************************************************************************
 *BEAM SECTION, ELSET = elset_pipe, MATERIAL=mat_steel, SECTION=THICK PIPE
- <orad>, <wt>
+ 0.091, 0.0148
 
  3, 16
 ************************************************************************
@@ -49,3 +28,4 @@ Test
  <young>, <poisson>
 *EXPANSION
  <alpha>
+**

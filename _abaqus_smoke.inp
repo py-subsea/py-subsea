@@ -1,0 +1,11 @@
+<py
+value = 2
+py>
+*PARAMETER
+<py
+for key, value in {"a": 1.5, "b": "skip", "c": [1,2]}.items():
+    if not isinstance(value, str) and hasattr(value, "__float__"):
+        $ {key} = {value}
+py>
+*TEST
+$ {value}

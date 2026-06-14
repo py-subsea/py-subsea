@@ -29,12 +29,39 @@ PySubsea currently includes the following modules:
 
 - ``linepipe_tools.py``: Provides the ``Pipe`` class for geometric and material property calculations of pipeline sections, including diameters, areas, stiffness, and moments of inertia.
 - ``dnv_tools.py``: Contains classes and functions for DNV pipeline code calculations, including general utilities and limit state checks (``DNVGeneral``, ``DNVLimitStates``).
-- ``lateral_buckling_tools.py``: Implements the ``LBDistributions`` class for lateral buckling reliability analysis and friction factor distribution fitting.
+- ``lateral_buckling_tools.py``: Implements the ``LBForces`` and ``LBDistributions`` classes for lateral buckling force calculations and reliability analysis, including friction factor distribution fitting.
 - ``pipe_soil_interaction_tools.py``: Provides the ``PSI`` class for pipe-soil interaction calculations, including resistance and displacement models.
 - ``oos_tools.py``: Contains the ``OOSAnonymisation`` and ``OOSSmoother`` classes for processing, anonymising, and smoothing Out-Of-Straightness (OOS) survey data.
-- ``abaqus_tools.py``: Includes the ``AbaqusPy`` class for generating sensitivity files and automating input preparation for Abaqus finite element analysis.
+- ``abaquspy.py``: Includes the ``AbaqusSensitivity`` class for generating sensitivity files and automating input preparation for Abaqus finite element analysis.
 
 Each module is designed to be imported and used independently or in combination, depending on your analysis needs. For more details, see the API Reference section of the documentation.
+
+Installing PySubsea
+-------------------
+
+PySubsea is distributed through the Python Package Index (PyPI) and can be installed using pip.
+
+Install the latest stable release with:
+
+.. code-block:: bash
+
+   $ pip install pysubsea
+
+This command downloads and installs PySubsea together with its required Python dependencies.
+
+AbaqusPy: A Python Preprocessor for Abaqus Input Files
+------------------------------------------------------
+
+AbaqusPy is an open-source framework, distributed as part of PySubsea, that provides a lightweight Python-based preprocessing and templating layer for Abaqus `.inp` workflows. It is intended to become a standalone project as it matures.
+
+AbaqusPy allows Python logic to be embedded directly within Abaqus input files while maintaining compatibility with standard Abaqus syntax. During preprocessing, AbaqusPy evaluates the embedded Python code and generates a standard executable Abaqus `.inp` file.
+
+AbaqusPy extends the standard Abaqus `.inp` syntax with:
+
+- `<py` and `py>` blocks for embedded Python logic, loops, calculations, and variable definitions
+- `$` output markers for writing Python-generated lines into the final executable Abaqus `.inp` file
+
+An AbaqusPy Visual Studio Code extension is also available, providing syntax highlighting for both Abaqus input files and AbaqusPy extensions, https://marketplace.visualstudio.com/.
 
 .. raw:: html
 
@@ -191,11 +218,31 @@ OOS Example - Syntetic Signal: Shows how to use the ``OOSDespiker``, ``OOSCurvat
 
 **The ``example_3_pysubsea.py`` script contains examples to illustrate:**
 
-AbaqusPy Example: Illustrates how to use the ``AbaqusPy`` class for generating Abaqus input files with sensitivity analysis.
+AbaqusSensitivity Example: Illustrates how to use the ``AbaqusSensitivity`` class from AbaqusPy for generating Abaqus input files with sensitivity analysis.
 
-.. figure:: _static/example_3.png
+Recommended import style:
+
+.. code-block:: python
+
+   import pysubsea.abaquspy as abqpy
+   writer = abqpy.AbaqusSensitivity(
+       template_filename="example_3_legacy",
+       sensitivity_filename="example_3_legacy_sens0",
+       param_dict={"PARAM_sens": [0]},
+       isens=0,
+   )
+   writer.run()
+
+.. figure:: _static/example_3_current.png
    :alt: Example 3
    :width: 600
    :align: center
 
-   Example 3: General Overview of a Master Abaqus Input File
+   Example 3: General Overview of a Master Abaqus Input File - Current Format.
+
+.. figure:: _static/example_3_legacy.png
+   :alt: Example 3
+   :width: 600
+   :align: center
+
+   Example 3: General Overview of a Master Abaqus Input File - Legacy Format.

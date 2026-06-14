@@ -43,6 +43,7 @@ autodoc_member_order = 'bysource'
 
 html_theme_options = {
     "show_nav_level": 2,               # Show second-level navigation
+    "show_toc_level": 3,               # Show third-level navigation
     "collapse_navigation": False,      # Collapses the submenus in the sidebar
     "navigation_depth": 4,             # Sidebar navigation depth
     "navigation_with_keys": True,
