@@ -30,6 +30,7 @@ PySubsea currently includes the following modules:
 - ``linepipe_tools.py``: Provides the ``Pipe`` class for geometric and material property calculations of pipeline sections, including diameters, areas, stiffness, and moments of inertia.
 - ``dnv_tools.py``: Contains classes and functions for DNV pipeline code calculations, including general utilities and limit state checks (``DNVGeneral``, ``DNVLimitStates``).
 - ``lateral_buckling_tools.py``: Implements the ``LBForces`` and ``LBDistributions`` classes for lateral buckling force calculations and reliability analysis, including friction factor distribution fitting.
+- ``upheaval_buckling_tools.py``: Provides the ``PropType`` class for natural prop-type imperfection calculations used in upheaval buckling screening.
 - ``pipe_soil_interaction_tools.py``: Provides the ``PSI`` class for pipe-soil interaction calculations, including resistance and displacement models.
 - ``oos_tools.py``: Contains the ``OOSAnonymisation`` and ``OOSSmoother`` classes for processing, anonymising, and smoothing Out-Of-Straightness (OOS) survey data.
 - ``abaquspy.py``: Includes the ``AbaqusSensitivity`` class for generating sensitivity files and automating input preparation for Abaqus finite element analysis.
@@ -91,6 +92,7 @@ The ``test_pysubsea.py`` script will automatically run doctests for the followin
 - ``DNVGeneral``
 - ``DNVLimitStates``
 - ``LBDistributions``
+- ``PropType``
 - ``PSI``
 
 Each method in these classes that includes a docstring example will be tested. The script will print a summary of the number of tests attempted, passed, and failed.

@@ -24,6 +24,7 @@ References
    linepipe_tools
    dnv_tools
    lateral_buckling_tools
+   upheaval_buckling_tools
    pipe_soil_interaction_tools
    oos_tools
    abaquspy

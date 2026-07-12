@@ -6,6 +6,7 @@ Library of pipeline calculations
 from .linepipe_tools import Pipe
 from .dnv_tools import DNVGeneral
 from .dnv_tools import DNVLimitStates
+from .dnv_tools import DNVSpanning
 from .lateral_buckling_tools import LBForces
 from .lateral_buckling_tools import LBSoilDistributions
 from .pipe_soil_interaction_tools import PSI
@@ -14,12 +15,14 @@ from .oos_tools import OOSDespiker
 from .oos_tools import OOSCurvature
 from .oos_tools import FFTSmoother
 from .oos_tools import GaussianSmoother
+from .upheaval_buckling_tools import PropType
 
 # __all__ for explicit API exposure:
 __all__ = [
     "Pipe",
     "DNVGeneral",
     "DNVLimitStates",
+    "DNVSpanning",
     "LBForces",
     "LBSoilDistributions",
     "PSI",
@@ -27,5 +30,6 @@ __all__ = [
     "OOSDespiker",
     "OOSCurvature",
     "FFTSmoother",
-    "GaussianSmoother"
+    "GaussianSmoother",
+    "PropType"
 ]

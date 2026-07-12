@@ -11,3 +11,8 @@ DNV Tools
    :undoc-members:
    :show-inheritance:
    :inherited-members:
+
+.. autoclass:: pysubsea.dnv_tools.DNVSpanning
+   :members:
+   :undoc-members:
+   :show-inheritance:

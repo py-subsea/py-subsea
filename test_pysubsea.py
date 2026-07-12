@@ -25,17 +25,23 @@ def run_doctests():
         pss.pipe_soil_interaction_tools, verbose=False,
         optionflags=doctest.NORMALIZE_WHITESPACE | doctest.ELLIPSIS
     )
+    result5 = doctest.testmod(
+        pss.upheaval_buckling_tools, verbose=False,
+        optionflags=doctest.NORMALIZE_WHITESPACE | doctest.ELLIPSIS
+    )
     total_attempted = (
         result1.attempted +
         result2.attempted +
         result3.attempted +
-        result4.attempted
+        result4.attempted +
+        result5.attempted
     )
     total_failed = (
         result1.failed +
         result2.failed +
         result3.failed +
-        result4.failed
+        result4.failed +
+        result5.failed
     )
     total_passed = total_attempted - total_failed
     print(

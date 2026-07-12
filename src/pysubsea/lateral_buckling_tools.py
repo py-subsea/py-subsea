@@ -37,6 +37,8 @@ class LBForces: # pylint: disable=too-many-instance-attributes, too-many-argumen
         Young's modulus of the material.
     submerged_weight : float or array-like, optional
         Submerged weight for the condition of interest.
+    propped_shape_height : float or array-like, optional
+        Imperfection height for the condition of interest.
     """
 
     def __init__(
@@ -45,7 +47,8 @@ class LBForces: # pylint: disable=too-many-instance-attributes, too-many-argumen
             outer_diameter=0.0,
             wall_thickness=0.0,
             youngs_modulus=0.0,
-            submerged_weight=0.0
+            submerged_weight=0.0,
+            propped_shape_height=0.0
         ):
         """
         Initialize with section, material, and submerged weight properties.
@@ -54,6 +57,7 @@ class LBForces: # pylint: disable=too-many-instance-attributes, too-many-argumen
         self.wall_thickness = np.asarray(wall_thickness, dtype = float)
         self.youngs_modulus = np.asarray(youngs_modulus, dtype = float)
         self.submerged_weight = np.asarray(submerged_weight, dtype = float)
+        self.propped_shape_height = np.asarray(propped_shape_height, dtype = float)
 
     def _section_properties(self):
         """
@@ -68,12 +72,13 @@ class LBForces: # pylint: disable=too-many-instance-attributes, too-many-argumen
         """
         pipe = Pipe(
             outer_diameter=self.outer_diameter,
-            wall_thickness=self.wall_thickness
+            wall_thickness=self.wall_thickness,
+            youngs_modulus=self.youngs_modulus
         )
         steel_area = pipe.steel_area()
-        area_moment_inertia = pipe.area_moment_inertia()
+        bending_stiffness = pipe.bending_stiffness()
 
-        return steel_area, area_moment_inertia
+        return steel_area, bending_stiffness
 
     def characteristic_buckling_force(self):
         """
@@ -87,19 +92,19 @@ class LBForces: # pylint: disable=too-many-instance-attributes, too-many-argumen
         Examples
         --------
         >>> lb = LBForces(
-        ...     youngs_modulus=[207.0e+09],
-        ...     outer_diameter=[0.2731],
-        ...     wall_thickness=[0.0127],
-        ...     submerged_weight=[1000.0]
+        ...     outer_diameter=[0.2731, 0.3239],
+        ...     wall_thickness=[0.0127, 0.0159],
+        ...     youngs_modulus=[207.0e+09, 207.0e+09],
+        ...     submerged_weight=[695.39794758, 1029.76124826]
         ... )
         >>> lb.characteristic_buckling_force()
-        array([1200711.7485...])
+        array([ 839099.6561..., 1351458.0306...])
         """
-        steel_area, area_moment_inertia = self._section_properties()
+        steel_area, bending_stiffness = self._section_properties()
         return (
             2.26
             * (self.youngs_modulus * steel_area) ** 0.25
-            * (self.youngs_modulus * area_moment_inertia) ** 0.25
+            * bending_stiffness ** 0.25
             * self.submerged_weight ** 0.5
         )
 
@@ -362,8 +367,11 @@ class LBSoilDistributions: # pylint: disable=too-many-instance-attributes, too-m
         ...     friction_factor_he=[1.5],
         ...     friction_factor_fit_type=['LE_BE_HE']
         ... )
-        >>> lb.friction_distribution_parameters()
-        (array([0.9684083]), array([0.30043236]), array([-0.07804666]), array([0.3031342]), array([0.56177265]), array([0.92492127]), array([1.52282131]), array([0.05765844]), array([[...]]), array([[...]]))
+        >>> result = lb.friction_distribution_parameters()
+        >>> result[:8]
+        (array([0.9684083]), array([0.30043236]), array([-0.07804666]), array([0.3031342]), array([0.56177265]), array([0.92492127]), array([1.52282131]), array([0.05765844]))
+        >>> result[8].shape, result[9].shape
+        ((1, 10000), (1, 10000))
         """
         # Initialize lists to store results
         mean_friction_list = []

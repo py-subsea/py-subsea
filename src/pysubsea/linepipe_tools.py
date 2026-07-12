@@ -36,6 +36,14 @@ class Pipe: # pylint: disable=too-many-arguments
         Corrosion allowance (m). Default is 0.
     youngs_modulus : float or array-like, optional
         Young's modulus of the material (Pa). Default is 0.
+    water_density : float or array-like, optional
+        Density of water (kg/m^3). Default is 0.
+    coating_density : float or array-like, optional
+        Density of the coating material (kg/m^3). Default is 0.
+    steel_density : float or array-like, optional
+        Density of steel (kg/m^3). Default is 0.
+    content_density : float or array-like, optional
+        Density of the pipe content (kg/m^3). Default is 0.
     """
     def __init__(
             self,
@@ -44,7 +52,11 @@ class Pipe: # pylint: disable=too-many-arguments
             wall_thickness=0.0,
             coating_thickness=0.0,
             corrosion_allowance=0.0,
-            youngs_modulus=0.0
+            youngs_modulus=0.0,
+            water_density=0.0,
+            coating_density=0.0,
+            steel_density=0.0,
+            content_density=0.0,
         ):
         """
         Initialize a Pipe object with geometric and material properties.
@@ -54,6 +66,10 @@ class Pipe: # pylint: disable=too-many-arguments
         self.coating_thickness = np.asarray(coating_thickness, dtype = float)
         self.corrosion_allowance = np.asarray(corrosion_allowance, dtype = float)
         self.youngs_modulus = np.asarray(youngs_modulus, dtype = float)
+        self.water_density = np.asarray(water_density, dtype = float)
+        self.coating_density = np.asarray(coating_density, dtype = float)
+        self.steel_density = np.asarray(steel_density, dtype = float)
+        self.content_density = np.asarray(content_density, dtype = float)
 
     def wall_thickness_corroded(self):
         """
@@ -299,3 +315,37 @@ class Pipe: # pylint: disable=too-many-arguments
         array([18272109.437121..., 37864772.21769765])
         """
         return self.youngs_modulus * self.area_moment_inertia()
+
+    def submerged_weight(self):
+        """
+        Calculate the submerged weight.
+
+        Returns
+        -------
+        submerged_weight : np.ndarray
+            Submerged weight of the pipe.
+
+        Examples
+        --------
+        >>> outer_diameter = [0.2731, 0.3239]
+        >>> wall_thickness = [0.0127, 0.0159]
+        >>> water_density = [1025.0, 1025.0]
+        >>> coating_density = [900.0, 900.0]
+        >>> steel_density = [7850.0, 7850.0]
+        >>> content_density = [1025.0, 1025.0]
+        >>> pipe = Pipe(
+        ...     outer_diameter=outer_diameter,
+        ...     wall_thickness=wall_thickness,
+        ...     water_density=water_density,
+        ...     coating_density=coating_density,
+        ...     steel_density=steel_density,
+        ...     content_density=content_density
+        ... )
+        >>> pipe.submerged_weight()
+        array([ 695.39794758, 1029.76124826])
+        """
+        steel_weight = 9.807 * self.steel_density * self.steel_area()
+        coating_weight = 9.807 * self.coating_density * self.coating_area()
+        content_weight = 9.807 * self.content_density * self.inner_area()
+        water_displaced_weight = 9.807 * self.water_density * self.total_outer_area()
+        return coating_weight + steel_weight + content_weight - water_displaced_weight
