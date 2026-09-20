@@ -3,30 +3,30 @@ Test Function
 '''
 
 import doctest
-import pysubsea as pss
+import pysubsea as ss
 
 def run_doctests():
     '''
     Run doctests for the pysubsea classes
     '''
     result1 = doctest.testmod(
-        pss.linepipe_tools, verbose=False,
+        ss.linepipe_tools, verbose=False,
         optionflags=doctest.NORMALIZE_WHITESPACE | doctest.ELLIPSIS
     )
     result2 = doctest.testmod(
-        pss.dnv_tools, verbose=False,
+        ss.dnv_tools, verbose=False,
         optionflags=doctest.NORMALIZE_WHITESPACE | doctest.ELLIPSIS
     )
     result3 = doctest.testmod(
-        pss.lateral_buckling_tools, verbose=False,
+        ss.lateral_buckling_tools, verbose=False,
         optionflags=doctest.NORMALIZE_WHITESPACE | doctest.ELLIPSIS
     )
     result4 = doctest.testmod(
-        pss.pipe_soil_interaction_tools, verbose=False,
+        ss.pipe_soil_interaction_tools, verbose=False,
         optionflags=doctest.NORMALIZE_WHITESPACE | doctest.ELLIPSIS
     )
     result5 = doctest.testmod(
-        pss.upheaval_buckling_tools, verbose=False,
+        ss.upheaval_buckling_tools, verbose=False,
         optionflags=doctest.NORMALIZE_WHITESPACE | doctest.ELLIPSIS
     )
     total_attempted = (

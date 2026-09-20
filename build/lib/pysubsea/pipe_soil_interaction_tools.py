@@ -29,11 +29,10 @@ class PSI: # pylint: disable=too-many-arguments
         Total outer diameter of the pipe, including coating.
     surface_roughness : str, optional
         Surface roughness of the pipe ('Smooth' or 'Rough').
-    undrained_shear_strength_depth_array : array_like, optional
-        Per-pipe depth values, in m, defining the undrained shear strength profile.
-    undrained_shear_strength_value_array : array_like, optional
-        Per-pipe undrained shear strength values, in Pa, matching
-        ``undrained_shear_strength_depth_array``.
+    undrained_shear_strength_at_seabed : float, optional
+        Undrained shear strength at the seabed, Su,0, in Pa.
+    undrained_shear_strength_gradient : float, optional
+        Gradient of undrained shear strength with depth, in Pa/m.
     submerged_unit_weight : float, optional
         Submerged unit weight of the soil, gamma', in N/m3.
     """
@@ -42,8 +41,8 @@ class PSI: # pylint: disable=too-many-arguments
             *,
             total_outer_diameter=0.0,
             surface_roughness=None,
-            undrained_shear_strength_depth_array=None,
-            undrained_shear_strength_value_array=None,
+            undrained_shear_strength_at_seabed=0.0,
+            undrained_shear_strength_gradient=0.0,
             submerged_unit_weight=0.0
         ):
         """
@@ -51,25 +50,22 @@ class PSI: # pylint: disable=too-many-arguments
         """
         self.total_outer_diameter =  np.asarray(total_outer_diameter, dtype = float)
         self.surface_roughness =  np.asarray(surface_roughness, dtype = object)
-        # Profiles are kept as per-pipe lists so each pipe may use its own number of points.
-        self.undrained_shear_strength_depth_array = [
-            np.asarray(profile, dtype = float)
-            for profile in (undrained_shear_strength_depth_array or [])
-        ]
-        self.undrained_shear_strength_value_array = [
-            np.asarray(profile, dtype = float)
-            for profile in (undrained_shear_strength_value_array or [])
-        ]
+        self.undrained_shear_strength_gradient = np.asarray(
+            undrained_shear_strength_gradient, dtype = float
+        )
+        self.undrained_shear_strength_at_seabed = np.asarray(
+            undrained_shear_strength_at_seabed, dtype = float
+        )
         self.submerged_unit_weight = np.asarray(submerged_unit_weight, dtype = float)
 
     @staticmethod
-    def _depth_geometry(outer_diameter, maximum_depth):
+    def _depth_geometry(outer_diameter):
         '''
         Calculate the depth, width, and penetrated area for a given pipe outer diameter.
         '''
-        # Create an array of depth values from 0.001 m to the maximum depth of the
-        # undrained shear strength profile at 0.001 m spacing.
-        depth = np.arange(1, int(round(maximum_depth / 0.001)) + 1) * 0.001
+        # Create an array of depth values from 0.001 m to 1.3 times the outer diameter
+        # with 200 evenly spaced points.
+        depth = np.linspace(0.001, 1.3 * outer_diameter, 200)
 
         # Calculate the width for a given pipe outer diameter (B).
         width = np.where(
@@ -93,16 +89,12 @@ class PSI: # pylint: disable=too-many-arguments
         Yield shared per-pipe inputs and depth geometry for the undrained models.
         '''
         for i, outer_diameter in enumerate(self.total_outer_diameter):
-            depth_profile = self.undrained_shear_strength_depth_array[i]
-            value_profile = self.undrained_shear_strength_value_array[i]
-            depth, width, penetrated_area = self._depth_geometry(
-                outer_diameter, np.max(depth_profile)
-            )
+            depth, width, penetrated_area = self._depth_geometry(outer_diameter)
             yield (
                 outer_diameter,
                 self.surface_roughness[i],
-                depth_profile,
-                value_profile,
+                self.undrained_shear_strength_gradient[i],
+                self.undrained_shear_strength_at_seabed[i],
                 self.submerged_unit_weight[i],
                 depth,
                 width,
@@ -110,19 +102,12 @@ class PSI: # pylint: disable=too-many-arguments
             )
 
     @staticmethod
-    def _shear_strength_gradient(depth, depth_profile, value_profile):
-        '''
-        Calculate the local undrained shear strength gradient along the depth array.
-        '''
-        return np.gradient(np.interp(depth, depth_profile, value_profile), depth)
-
-    @staticmethod
     def _reference_shear_strength(
             outer_diameter,
             depth,
             width,
-            depth_profile,
-            value_profile
+            shear_strength_gradient,
+            seabed_shear_strength
         ):
         '''
         Calculate the reference depth and shear strength for Model 1.
@@ -135,8 +120,8 @@ class PSI: # pylint: disable=too-many-arguments
         )
 
         # Calculate the reference shear strength for Model 1 (su,0).
-        reference_shear_strength = np.interp(
-            reference_depth, depth_profile, value_profile
+        reference_shear_strength = (
+            seabed_shear_strength + shear_strength_gradient * reference_depth
         )
         return reference_depth, reference_shear_strength
 
@@ -200,33 +185,30 @@ class PSI: # pylint: disable=too-many-arguments
         Calculate vertical penetration resistance using undrained Model 1.
 
         The calculation follows the bearing-capacity formulation in the attached
-        PDF. For each pipe, the method evaluates depths at 0.001 m spacing from
-        0.001 m to the maximum depth of ``undrained_shear_strength_depth_array``
-        and prepends the zero-depth point to the returned arrays. The
-        reference shear strength is linearly interpolated at ``zsu,0`` from the
-        profile defined by ``undrained_shear_strength_depth_array`` and
-        ``undrained_shear_strength_value_array``, and the buoyancy contribution
-        uses the supplied submerged unit weight.
+        PDF. For each pipe, the method evaluates 200 depths from 0.001 m to
+        ``1.3 * total_outer_diameter`` and prepends the zero-depth point to the returned arrays. The
+        reference shear strength is calculated as ``Su,0 + rho * zsu,0`` and
+        the buoyancy contribution uses the supplied submerged unit weight.
 
         Returns
         -------
         depth_arrays : np.ndarray
-            Depth arrays with shape ``(n_pipes, n_depths)``.
+            Depth arrays with shape ``(n_pipes, 201)``.
         vertical_bearing_capacity_arrays : np.ndarray
             Vertical penetration resistance arrays with shape
-            ``(n_pipes, n_depths)``, in N/m.
+            ``(n_pipes, 201)``, in N/m.
         Examples
         --------
         >>> psi = PSI(
         ...     total_outer_diameter=[0.2731],
         ...     surface_roughness=['Smooth'],
-        ...     undrained_shear_strength_depth_array=[[0.0, 0.3, 0.5, 1.0, 2.0]],
-        ...     undrained_shear_strength_value_array=[[1200, 5300, 3000, 4200, 6300]],
+        ...     undrained_shear_strength_gradient=[1000.0],
+        ...     undrained_shear_strength_at_seabed=[5000.0],
         ...     submerged_unit_weight=[5500.0]
         ... )
         >>> depths, capacities = psi.downward_undrained_model1()
         >>> depths.shape, capacities.shape, float(depths[0, 0]), round(float(depths[0, -1]), 5), float(capacities[0, 0])
-        ((1, 2001), (1, 2001), 0.0, 2.0, 0.0)
+        ((1, 201), (1, 201), 0.0, 0.35503, 0.0)
         """
         depth_arrays = []
         vertical_bearing_capacity_arrays = []
@@ -234,8 +216,8 @@ class PSI: # pylint: disable=too-many-arguments
         for (
                 outer_diameter,
                 surface_roughness,
-                shear_strength_depth_profile,
-                shear_strength_value_profile,
+                shear_strength_gradient,
+                seabed_shear_strength,
                 submerged_unit_weight,
                 depth,
                 width,
@@ -247,18 +229,8 @@ class PSI: # pylint: disable=too-many-arguments
                 outer_diameter,
                 depth,
                 width,
-                shear_strength_depth_profile,
-                shear_strength_value_profile
-            )
-
-            # Local gradient and mudline strength derived from the profile.
-            shear_strength_gradient = self._shear_strength_gradient(
-                depth,
-                shear_strength_depth_profile,
-                shear_strength_value_profile
-            )
-            seabed_shear_strength = np.interp(
-                0.0, shear_strength_depth_profile, shear_strength_value_profile
+                shear_strength_gradient,
+                seabed_shear_strength
             )
 
             # Calculate the interpolated pipe-soil friction factor based on surface roughness and shear strength.
@@ -308,34 +280,31 @@ class PSI: # pylint: disable=too-many-arguments
 
         Model 2 follows the alternative formulation in the attached PDF. It
         combines the minimum of the two resistance-factor terms with the soil
-        buoyancy contribution. For each pipe, the method evaluates depths at
-        0.001 m spacing from 0.001 m to the maximum depth of
-        ``undrained_shear_strength_depth_array`` and prepends the zero-depth
-        point to the returned arrays. The shear strength at the pipe invert is
-        linearly interpolated from the profile defined by
-        ``undrained_shear_strength_depth_array`` and
-        ``undrained_shear_strength_value_array``.
+        buoyancy contribution. For each pipe, the method evaluates 200 depths
+        from 0.001 m to ``1.3 * total_outer_diameter`` and prepends the zero-depth
+        point to the returned arrays. The shear strength at the pipe invert is calculated as
+        ``Su,0 + rho * z``.
 
         Returns
         -------
         depth_arrays : np.ndarray
-            Depth arrays with shape ``(n_pipes, n_depths)``.
+            Depth arrays with shape ``(n_pipes, 201)``.
         vertical_bearing_capacity_arrays : np.ndarray
             Vertical penetration resistance arrays with shape
-            ``(n_pipes, n_depths)``, in N/m.
+            ``(n_pipes, 201)``, in N/m.
 
         Examples
         --------
         >>> psi = PSI(
         ...     total_outer_diameter=[0.2731],
         ...     surface_roughness=['Smooth'],
-        ...     undrained_shear_strength_depth_array=[[0.0, 0.3, 0.5, 1.0, 2.0]],
-        ...     undrained_shear_strength_value_array=[[1200, 5300, 3000, 4200, 6300]],
+        ...     undrained_shear_strength_gradient=[1000.0],
+        ...     undrained_shear_strength_at_seabed=[5000.0],
         ...     submerged_unit_weight=[5500.0]
         ... )
         >>> depths, capacities = psi.downward_undrained_model2()
         >>> depths.shape, capacities.shape, float(depths[0, 0]), round(float(depths[0, -1]), 5), float(capacities[0, 0])
-        ((1, 2001), (1, 2001), 0.0, 2.0, 0.0)
+        ((1, 201), (1, 201), 0.0, 0.35503, 0.0)
         """
         depth_arrays = []
         vertical_bearing_capacity_arrays = []
@@ -343,8 +312,8 @@ class PSI: # pylint: disable=too-many-arguments
         for (
                 outer_diameter,
                 _,
-                shear_strength_depth_profile,
-                shear_strength_value_profile,
+                shear_strength_gradient,
+                seabed_shear_strength,
                 submerged_unit_weight,
                 depth,
                 _,
@@ -352,11 +321,7 @@ class PSI: # pylint: disable=too-many-arguments
             ) in self._model_inputs():
 
             # Calculate the shear strength at the pipe invert for Model 2.
-            shear_strength = np.interp(
-                depth,
-                shear_strength_depth_profile,
-                shear_strength_value_profile
-            )
+            shear_strength = seabed_shear_strength + shear_strength_gradient * depth
 
             # Calculate the resistance factor for Model 2 based on depth and outer diameter.
             resistance_factor = np.minimum(

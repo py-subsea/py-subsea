@@ -115,28 +115,6 @@ class Pipe: # pylint: disable=too-many-arguments
         """
         return self.outer_diameter - 2.0 * self.wall_thickness
 
-    def mid_wall_radius(self):
-        """
-        Calculate the radius at the middle of the pipe wall.
-
-        Returns
-        -------
-        mid_wall_radius : np.ndarray
-            Radius at the middle of the pipe wall.
-
-        Examples
-        --------
-        >>> outer_diameter = [0.2731, 0.3239]
-        >>> wall_thickness = [0.0127, 0.0159]
-        >>> pipe = Pipe(
-        ...     outer_diameter=outer_diameter,
-        ...     wall_thickness=wall_thickness
-        ... )
-        >>> pipe.mid_wall_radius()
-        array([0.1302, 0.154 ])
-        """
-        return (self.outer_diameter - self.wall_thickness) / 2.0
-
     def inner_area(self):
         """
         Calculate the pipe inner area.
@@ -312,28 +290,6 @@ class Pipe: # pylint: disable=too-many-arguments
         array([8.82710601e-05, 1.82921605e-04])
         """
         return np.pi / 64.0 * (self.outer_diameter ** 4 - self.inner_diameter() ** 4)
-
-    def section_modulus(self):
-        """
-        Calculate the section modulus of the steel pipe about its mid-wall diameter.
-
-        Returns
-        -------
-        section_modulus : np.ndarray
-            Elastic section modulus of the pipe.
-
-        Examples
-        --------
-        >>> outer_diameter = [0.2731, 0.3239]
-        >>> wall_thickness = [0.0127, 0.0159]
-        >>> pipe = Pipe(
-        ...     outer_diameter=outer_diameter,
-        ...     wall_thickness=wall_thickness
-        ... )
-        >>> pipe.section_modulus()
-        array([0.000677..., 0.001187...])
-        """
-        return self.area_moment_inertia() / self.mid_wall_radius()
 
     def bending_stiffness(self):
         """

@@ -49,19 +49,37 @@ def data():
     df['Burst Pressure'] = dnv.burst_pressure()
 
     # Example of PSI calculation
+    # The linear seabed strength and gradient are expressed as a two-point profile.
+    profile_depths = [[0.0, 5.0]] * len(df)
+    profile_values = [
+        [seabed_strength, seabed_strength + gradient * 5.0]
+        for seabed_strength, gradient in zip(
+            df['Undrained Shear Strength at Seabed'],
+            df['Undrained Shear Strength Gradient']
+        )
+    ]
     psi = ss.PSI(
         total_outer_diameter = df['Total Outer Diameter'],
         surface_roughness = df['Surface Roughness'],
-        density = df['Density'],
-        surcharge_on_seabed = df['Surcharge on Seabed'],
-        burial_depth = df['Burial Depth']
+        undrained_shear_strength_depth_array = profile_depths,
+        undrained_shear_strength_value_array = profile_values,
+        submerged_unit_weight = df['Submerged Unit Weight']
     )
     depth_arrays, vertical_bearing_capacity_arrays = psi.downward_undrained_model1()
     df['Depth Arrays'] = list(depth_arrays)
     df['Vertical Bearing Capacity Arrays'] = list(vertical_bearing_capacity_arrays)
 
+    # The alternative undrained formulation uses the same PSI configuration.
+    depth_arrays_model2, vertical_bearing_capacity_arrays_model2 = (
+        psi.downward_undrained_model2()
+    )
+    df['Depth Arrays Model 2'] = list(depth_arrays_model2)
+    df['Vertical Bearing Capacity Arrays Model 2'] = list(
+        vertical_bearing_capacity_arrays_model2
+    )
+
     # Example of lateral buckling calculation
-    lb = ss.LBDistributions(
+    lb = ss.LBSoilDistributions(
         friction_factor_le = df['Lateral Friction Factor - LE'],
         friction_factor_be = df['Lateral Friction Factor - BE'],
         friction_factor_he = df['Lateral Friction Factor - HE'],
@@ -75,8 +93,14 @@ def data():
         df['Lateral Friction Factor - LE Fit'],
         df['Lateral Friction Factor - BE Fit'],
         df['Lateral Friction Factor - HE Fit'],
-        df['Lateral Friction Factor - RMSE']
-    ) = lb.friction_distribution()
+        df['Lateral Friction Factor - RMSE'],
+        df['Lateral Friction Factor - R²'],
+        friction_factor_range,
+        friction_factor_cdf,
+    ) = lb.friction_distribution_parameters()
+
+    df['Lateral Friction Factor - Friction Factor Range'] = list(friction_factor_range)
+    df['Lateral Friction Factor - Friction Factor CDF'] = list(friction_factor_cdf)
 
     return df
 
@@ -87,4 +111,4 @@ dfe1 = data()
 dfe1 = dfe1.transpose()
 new_cols = [f'Sensitivity{i}' for i in range(1, dfe1.shape[1]+1)]
 dfe1.columns = new_cols[:dfe1.shape[1]]
-dfe1.to_csv('example_1_output.csv')
+dfe1.to_csv('example_1_output.csv', encoding="utf-8-sig")

@@ -29,7 +29,7 @@ PySubsea currently includes the following modules:
 
 - ``linepipe_tools.py``: Provides the ``Pipe`` class for geometric and material property calculations of pipeline sections, including diameters, areas, stiffness, and moments of inertia.
 - ``dnv_tools.py``: Contains classes and functions for DNV pipeline code calculations, including general utilities and limit state checks (``DNVGeneral``, ``DNVLimitStates``).
-- ``lateral_buckling_tools.py``: Implements the ``LBForces`` and ``LBDistributions`` classes for lateral buckling force calculations and reliability analysis, including friction factor distribution fitting.
+- ``lateral_buckling_tools.py``: Implements the ``LBForceDistributions``, ``LBOOSDistributions`` and ``LBSoilDistributions`` classes for lateral buckling force calculations and reliability analysis.
 - ``upheaval_buckling_tools.py``: Provides the ``PropType`` class for natural prop-type imperfection calculations used in upheaval buckling screening.
 - ``pipe_soil_interaction_tools.py``: Provides the ``PSI`` class for pipe-soil interaction calculations, including resistance and displacement models.
 - ``oos_tools.py``: Contains the ``OOSAnonymisation`` and ``OOSSmoother`` classes for processing, anonymising, and smoothing Out-Of-Straightness (OOS) survey data.
@@ -86,16 +86,15 @@ To run all tests, simply execute the following command in your terminal from the
 What Does It Test?
 ------------------
 
-The ``test_pysubsea.py`` script will automatically run doctests for the following classes:
+The ``test_pysubsea.py`` script will automatically run doctests for the following libraries:
 
-- ``Pipe``
-- ``DNVGeneral``
-- ``DNVLimitStates``
-- ``LBDistributions``
-- ``PropType``
-- ``PSI``
+- ``LinePipeTools``
+- ``DNVTools``
+- ``LateralBucklingTools``
+- ``UpheavalBucklingTools``
+- ``PipeSoilInteractionTools``
 
-Each method in these classes that includes a docstring example will be tested. The script will print a summary of the number of tests attempted, passed, and failed.
+Each method in these libraries that includes a docstring example will be tested. The script will print a summary of the number of tests attempted, passed, and failed.
 
 This makes it easy to check that all core functionality is working as intended after installation or modification.
 
@@ -226,25 +225,23 @@ Recommended import style:
 
 .. code-block:: python
 
-   import pysubsea.abaquspy as abqpy
-   writer = abqpy.AbaqusSensitivity(
-       template_filename="example_3_legacy",
-       sensitivity_filename="example_3_legacy_sens0",
-       param_dict={"PARAM_sens": [0]},
-       isens=0,
-   )
-   writer.run()
-
-.. figure:: _static/example_3_current.png
+.. figure:: _static/example_3.png
    :alt: Example 3
    :width: 600
    :align: center
 
    Example 3: General Overview of a Master Abaqus Input File - Current Format.
 
-.. figure:: _static/example_3_legacy.png
-   :alt: Example 3
+.. figure:: _static/example_3_current.png
+   :alt: Example 3 Current
    :width: 600
    :align: center
 
-   Example 3: General Overview of a Master Abaqus Input File - Legacy Format.
+   Example 4: General Overview of a Master Abaqus Input File - Current Format.
+
+.. figure:: _static/example_3_legacy.png
+   :alt: Example 3 Legacy
+   :width: 600
+   :align: center
+
+   Example 5: General Overview of a Master Abaqus Input File - Legacy Format.
