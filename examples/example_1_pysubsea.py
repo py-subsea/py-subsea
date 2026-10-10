@@ -32,6 +32,7 @@ def data():
         outer_diameter = df['Outer Diameter'],
         wall_thickness = df['Wall Thickness'],
         corrosion_allowance = df['Corrosion Allowance'],
+        coating_thicknesses = df['Coating Thickness'],
     )
     df['Corroded Wall Thickness'] = pipe.wall_thickness_corroded()
     df['Total Outer Diameter'] = pipe.total_outer_diameter()
