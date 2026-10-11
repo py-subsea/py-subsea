@@ -4,13 +4,13 @@ properties, and table-based soil parameters.
 
 **Features:**
 
-- The `DNVGeneral` class implements calculations for temperature derating, yield and tensile
+- The `MaterialStrength` class implements calculations for temperature derating, yield and tensile
   strength, and characteristic material burst strength, supporting both scalar and array-based
   inputs.
-- The `DNVLimitStates` class extends `DNVGeneral` and provides burst pressure calculations for
+- The `LimitStates` class extends `MaterialStrength` and provides burst pressure calculations for
     pipelines according to DNV standards.
-- The `DNVSpanning` class returns the quantities from the attached DNV soil lookup tables for
-    sand, clay, and clay L/D factors.
+- The soil stiffness helpers provide dynamic stiffness quantities from the attached DNV
+  soil lookup tables for sand and clay.
 - Designed for use in subsea pipeline and riser engineering, but general enough for any DNV-based
   pipeline property calculations.
 
@@ -23,9 +23,9 @@ All calculations are vectorized using NumPy for efficiency and flexibility.
 '''
 
 import numpy as np
-from .linepipe_tools import Pipe
 
-class DNVGeneral: # pylint: disable=too-many-instance-attributes, too-many-arguments
+
+class MaterialStrength: # pylint: disable=too-many-instance-attributes, too-many-arguments
     """
     Base class for DNV pipeline limit state calculations. Provides methods for temperature
     derating, yield and tensile strength, and characteristic material burst strength,
@@ -93,7 +93,7 @@ class DNVGeneral: # pylint: disable=too-many-instance-attributes, too-many-argum
         --------
         >>> materials = np.array([1, 1, 2, 2])
         >>> temperatures = np.array([80.0, 110.0, 80.0, 110.0])
-        >>> dnv = DNVGeneral(
+        >>> dnv = MaterialStrength(
         ...     material=materials, 
         ...     temperature=temperatures
         ... )
@@ -130,7 +130,7 @@ class DNVGeneral: # pylint: disable=too-many-instance-attributes, too-many-argum
         >>> smys = np.array([450.0E+06, 450.0E+06, 550.0E+06, 550.0E+06])
         >>> temperatures = np.array([80.0, 110.0, 80.0, 110.0])
         >>> material_strength_factor = np.array([0.96, 0.96, 0.96, 0.96])
-        >>> dnv = DNVGeneral(
+        >>> dnv = MaterialStrength(
         ...     material=materials,
         ...     smys=smys,
         ...     temperature=temperatures,
@@ -158,7 +158,7 @@ class DNVGeneral: # pylint: disable=too-many-instance-attributes, too-many-argum
         >>> smts = np.array([485.0E+06, 485.0E+06, 590.0E+06, 590.0E+06])
         >>> temperatures = np.array([80.0, 110.0, 80.0, 110.0])
         >>> material_strength_factor = np.array([0.96, 0.96, 0.96, 0.96])
-        >>> dnv = DNVGeneral(
+        >>> dnv = MaterialStrength(
         ...     material=materials,
         ...     smts=smts,
         ...     temperature=temperatures,
@@ -187,7 +187,7 @@ class DNVGeneral: # pylint: disable=too-many-instance-attributes, too-many-argum
         >>> smts = np.array([600.0E+06, 600.0E+06, 700.0E+06, 700.0E+06])
         >>> temperatures = np.array([80.0, 110.0, 80.0, 110.0])
         >>> material_strength_factor = np.array([0.96, 0.96, 0.96, 0.96])
-        >>> dnv = DNVGeneral(
+        >>> dnv = MaterialStrength(
         ...     material=materials,
         ...     smys=smys,
         ...     smts=smts,
@@ -202,11 +202,11 @@ class DNVGeneral: # pylint: disable=too-many-instance-attributes, too-many-argum
         return np.minimum(yield_stress_value, tensile_strength_value / 1.15)
 
 
-class DNVLimitStates(DNVGeneral):
+class LimitStates(MaterialStrength):
     """
     Class for DNV pipeline burst pressure limit state calculations.
 
-    Extends `DNVGeneral` to provide burst pressure calculations for corroded pipelines
+    Extends `MaterialStrength` to provide burst pressure calculations for corroded pipelines
     according to DNV standards, using material, geometric, and strength properties.
 
     Parameters
@@ -228,7 +228,7 @@ class DNVLimitStates(DNVGeneral):
 
     Notes
     -----
-    All parameters are passed to the parent class `DNVGeneral`.
+    All parameters are passed to the parent class `MaterialStrength`.
     """
 
     def burst_pressure(self):
@@ -254,7 +254,7 @@ class DNVLimitStates(DNVGeneral):
         >>> smts = np.array([600.0E+06, 600.0E+06, 700.0E+06, 700.0E+06])
         >>> temperatures = np.array([80.0, 110.0, 80.0, 110.0])
         >>> material_strength_factor = np.array([0.96, 0.96, 0.96, 0.96])
-        >>> dnv = DNVLimitStates(
+        >>> dnv = LimitStates(
         ...     outer_diameter=outer_diameter,
         ...     corroded_wall_thickness=corroded_wall_thickness,
         ...     material=materials,
@@ -273,241 +273,3 @@ class DNVLimitStates(DNVGeneral):
             * fcb * 2.0 / np.sqrt(3.0)
         )
 
-
-class DNVSpanning:
-    """
-    Class for DNV pipeline spanning calculations.
-
-    Parameters
-    ----------
-    total_outer_diameter : float or array-like, optional
-        Total outer diameter of the pipe. Default is 0.
-    water_density : float or array-like, optional
-        Density of water. Default is 0.
-    submerged_weight : float or array-like, optional
-        Submerged weight of the pipe. Default is 0.
-    soil_type : str or array-like, optional
-        Soil type for lookup: 'Loose Sand', 'Medium Sand', 'Dense Sand',
-        'Very Soft Clay', 'Soft Clay', 'Firm Clay', 'Stiff Clay',
-        'Very Stiff Clay', or 'Hard Clay'. Default is None.
-
-    Notes
-    -----
-    All inputs support scalar and array-like values. When arrays are supplied,
-    NumPy broadcasting rules apply.
-
-    Examples
-    --------
-    >>> spanning = DNVSpanning(
-    ...     total_outer_diameter=[0.2791, 0.3299],
-    ...     water_density=[1025.0, 1025.0],
-    ...     submerged_weight=[695.39794758, 1029.76124826],
-    ...     soil_type=["Medium Sand", "Stiff Clay"]
-    ... )
-    >>> spanning.specific_mass_ratio()
-    array([2.1307..., 2.1984...])
-    >>> spanning.dynamic_stiffness_horizontal()
-    array([15635465.7..., 6044648.6...])
-    >>> spanning.dynamic_stiffness_vertical()
-    array([20669105.6..., 9299459.4...])
-    """
-
-    SOIL_PROPERTIES = {
-        "Loose Sand": {
-            "Cv": 10500.0E+03,
-            "Cl": 9000.0E+03,
-            "Kv": 250.0E+03,
-            "soil_poisson": 0.35,
-        },
-        "Medium Sand": {
-            "Cv": 14500.0E+03,
-            "Cl": 12500.0E+03,
-            "Kv": 530.0E+03,
-            "soil_poisson": 0.35,
-        },
-        "Dense Sand": {
-            "Cv": 21000.0E+03,
-            "Cl": 18000.0E+03,
-            "Kv": 1350.0E+03,
-            "soil_poisson": 0.35,
-        },
-        "Very Soft Clay": {
-            "Cv": 600.0E+03,
-            "Cl": 500.0E+03,
-            "Kv": 100.0E+03,
-            "soil_poisson": 0.5,
-        },
-        "Soft Clay": {
-            "Cv": 1400.0E+03,
-            "Cl": 1200.0E+03,
-            "Kv": 260.0E+03,
-            "soil_poisson": 0.5,
-        },
-        "Firm Clay": {
-            "Cv": 3000.0E+03,
-            "Cl": 2600.0E+03,
-            "Kv": 800.0E+03,
-            "soil_poisson": 0.5,
-        },
-        "Stiff Clay": {
-            "Cv": 4500.0E+03,
-            "Cl": 3900.0E+03,
-            "Kv": 1600.0E+03,
-            "soil_poisson": 0.5,
-        },
-        "Very Stiff Clay": {
-            "Cv": 11000.0E+03,
-            "Cl": 9500.0E+03,
-            "Kv": 3000.0E+03,
-            "soil_poisson": 0.5,
-        },
-        "Hard Clay": {
-            "Cv": 12000.0E+03,
-            "Cl": 10500.0E+03,
-            "Kv": 4200.0E+03,
-            "soil_poisson": 0.5,
-        },
-    }
-
-    def __init__(
-            self,
-            *,
-            total_outer_diameter=0.0,
-            water_density=0.0,
-            submerged_weight=0.0,
-            soil_type=None
-        ):
-        """
-        Initialize a DNVSpanning object with pipe and soil properties.
-        """
-        self.total_outer_diameter = np.asarray(total_outer_diameter, dtype = float)
-        self.water_density = np.asarray(water_density, dtype = float)
-        self.submerged_weight = np.asarray(submerged_weight, dtype = float)
-        self.soil_type = np.asarray(soil_type, dtype = object)
-
-    def _lookup_soil_property(self, property_name):
-        """
-        Return a soil property array mapped from the input soil types.
-
-        Parameters
-        ----------
-        property_name : str
-            One of 'Cv', 'Cl', 'Kv', or 'soil_poisson'.
-
-        Returns
-        -------
-        np.ndarray
-            Property values with shape compatible with ``soil_type``.
-
-        Raises
-        ------
-        ValueError
-            If a soil type or property name is not supported.
-        """
-        valid_properties = ("Cv", "Cl", "Kv", "soil_poisson")
-        if property_name not in valid_properties:
-            raise ValueError(
-                "Unsupported property name. Expected one of: "
-                + ", ".join(valid_properties)
-            )
-
-        flat_soil_types = np.ravel(self.soil_type)
-        values = np.empty(flat_soil_types.shape[0], dtype = float)
-
-        for i, soil in enumerate(flat_soil_types):
-            try:
-                values[i] = self.SOIL_PROPERTIES[soil][property_name]
-            except KeyError as exc:
-                raise ValueError(
-                    "Unsupported soil type. Expected one of: "
-                    + ", ".join(self.SOIL_PROPERTIES.keys())
-                ) from exc
-
-        return values.reshape(self.soil_type.shape)
-
-    def specific_mass_ratio(self):
-        """
-        Calculate the specific mass ratio of the pipe.
-
-        Returns
-        -------
-        specific_mass_ratio : np.ndarray
-            The specific mass ratio of the pipe.
-
-        Notes
-        -----
-        The specific mass ratio is calculated as the ratio of the submerged weight to the product
-        of the water density and the total outer diameter of the pipe.
-        """
-        pipe = Pipe(
-            outer_diameter=self.total_outer_diameter
-        )
-        total_outer_area = pipe.total_outer_area()
-        return 1.0 + (self.submerged_weight / (9.807 * self.water_density * total_outer_area))
-
-    def soil_properties(self):
-        """
-        Return lookup properties for the configured soil type(s).
-
-        Returns
-        -------
-        dict
-            Dictionary with keys ``Cv``, ``Cl``, ``Kv``, and ``soil_poisson``.
-        """
-        return {
-            "Cv": self._lookup_soil_property("Cv"),
-            "Cl": self._lookup_soil_property("Cl"),
-            "Kv": self._lookup_soil_property("Kv"),
-            "soil_poisson": self._lookup_soil_property("soil_poisson"),
-        }
-
-    def dynamic_stiffness_horizontal(self):
-        """
-        Calculate the dynamic stiffness of the pipe based on soil type.
-
-        Returns
-        -------
-        k_horiz_dynamic : float or array-like
-            Horizontal dynamic stiffness.
-
-        Raises
-        ------
-        ValueError
-            If the soil type is not supported.
-
-        Notes
-        -----
-        The dynamic stiffness is calculated using the DNV soil lookup tables for sand and clay.
-        """
-        specific_mass_ratio = self.specific_mass_ratio()
-        tod = self.total_outer_diameter
-        properties = self.soil_properties()
-        cl = properties["Cl"]
-        soil_poisson = properties["soil_poisson"]
-
-        return cl * (1.0 + soil_poisson) * (2.0 * specific_mass_ratio / 3.0 + 1.0 / 3.0) * tod**0.5
-
-    def dynamic_stiffness_vertical(self):
-        """
-        Calculate the dynamic stiffness of the pipe based on soil type.
-
-        Returns
-        -------
-        k_vert_dynamic : float or array-like
-            Vertical dynamic stiffness.
-
-        Raises
-        ------
-        ValueError
-            If the soil type is not supported.
-
-        Notes
-        -----
-        The dynamic stiffness is calculated using the DNV soil lookup tables for sand and clay.
-        """
-        specific_mass_ratio = self.specific_mass_ratio()
-        tod = self.total_outer_diameter
-        properties = self.soil_properties()
-        cv = properties["Cv"]
-        soil_poisson = properties["soil_poisson"]
-        return cv / (1.0 - soil_poisson) * (2.0 * specific_mass_ratio / 3.0 + 1.0 / 3.0) * tod**0.5

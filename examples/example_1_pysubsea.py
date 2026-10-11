@@ -38,7 +38,7 @@ def data():
     df['Total Outer Diameter'] = pipe.total_outer_diameter()
 
     # Example of DNV limit state calculation
-    dnv = ss.DNVLimitStates(
+    dnv = ss.LimitStates(
         outer_diameter = df['Outer Diameter'],
         corroded_wall_thickness = df['Corroded Wall Thickness'],
         material = df['Material'],

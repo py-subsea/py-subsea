@@ -6,7 +6,7 @@ sys.path.insert(0, os.path.abspath("../src"))
 project = 'PySubsea'
 copyright = '2026, Subsea Energies'
 author = 'Subsea Energies'
-release = 'v0.1.8'
+release = 'v0.1.9'
 
 extensions = [
     'sphinx.ext.todo',

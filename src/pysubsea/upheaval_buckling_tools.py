@@ -48,7 +48,7 @@ class PropType: # pylint: disable=too-many-instance-attributes, too-many-argumen
         self.propped_shape_height = np.asarray(propped_shape_height, dtype = float)
         self.euler_wave_number = np.asarray(euler_wave_number, dtype = float)
 
-    def propped_type_length(self):
+    def propped_type_shape_span_length(self):
         """
         Compute natural prop-type imperfection length.
 
@@ -64,7 +64,7 @@ class PropType: # pylint: disable=too-many-instance-attributes, too-many-argumen
         ...     submerged_weight=[695.39794758, 1029.76124826],
         ...     propped_shape_height=[0.5, 0.5]
         ... )
-        >>> prop.propped_type_length()
+        >>> prop.propped_type_shape_span_length()
         array([62.372..., 67.839...])
         """
         length = 2.0 * (
@@ -72,7 +72,7 @@ class PropType: # pylint: disable=too-many-instance-attributes, too-many-argumen
         ) ** 0.25
         return length
 
-    def propped_shape_buckling_force(self):
+    def propped_type_shape_lift_off_force(self):
         """
         Compute propped shape buckling force.
 
@@ -89,7 +89,7 @@ class PropType: # pylint: disable=too-many-instance-attributes, too-many-argumen
 
         Returns
         -------
-        propped_shape_buckling_force : np.ndarray
+        propped_type_shape_lift_off_force : np.ndarray
             Propped shape lateral buckling force.
 
         Examples
@@ -99,7 +99,7 @@ class PropType: # pylint: disable=too-many-instance-attributes, too-many-argumen
         ...     submerged_weight=[695.39794758, 1029.76124826],
         ...     propped_shape_height=[0.5, 0.5]
         ... )
-        >>> prop.propped_shape_buckling_force()
+        >>> prop.propped_type_shape_lift_off_force()
         array([ 637655.3903..., 1117019.9655...])
         """
         return (
@@ -107,7 +107,7 @@ class PropType: # pylint: disable=too-many-instance-attributes, too-many-argumen
             * (self.bending_stiffness * self.submerged_weight / self.propped_shape_height) ** 0.5
         )
 
-    def euler_buckling_force(self):
+    def span_euler_buckling_force(self):
         """
         Compute Euler buckling force using wave-number index ``m``.
 
@@ -116,7 +116,7 @@ class PropType: # pylint: disable=too-many-instance-attributes, too-many-argumen
         ``Pm = m^2 * pi^2 * EI / L^2``
 
         where ``L`` is the natural prop-type imperfection length from
-        :meth:`propped_type_length` and ``m`` is taken from ``euler_wave_number``.
+        :meth:`propped_type_shape_span_length` and ``m`` is taken from ``euler_wave_number``.
 
         Common values of ``m`` by boundary condition are:
 
@@ -125,7 +125,7 @@ class PropType: # pylint: disable=too-many-instance-attributes, too-many-argumen
 
         Returns
         -------
-        euler_buckling_force : np.ndarray
+        span_euler_buckling_force : np.ndarray
             Euler critical buckling force, ``Pm``.
 
         Examples
@@ -136,10 +136,10 @@ class PropType: # pylint: disable=too-many-instance-attributes, too-many-argumen
         ...     propped_shape_height=[0.5, 0.5, 0.5, 0.5],
         ...     euler_wave_number=[1, 2, 1, 2],
         ... )
-        >>> np.round(prop.euler_buckling_force(), 4)
+        >>> np.round(prop.span_euler_buckling_force(), 4)
         array([ 46355.3848, 185421.5391,  81204.9721, 324819.8885])
         """
-        length = self.propped_type_length()
+        length = self.propped_type_shape_span_length()
         return (
             self.euler_wave_number ** 2
             * (np.pi ** 2 * self.bending_stiffness)

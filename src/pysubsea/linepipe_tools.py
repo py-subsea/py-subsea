@@ -19,6 +19,7 @@ All calculations are vectorized using NumPy for efficiency and flexibility.
 '''
 
 import numpy as np
+
 class Pipe: # pylint: disable=too-many-arguments
     """
     Class representing a pipeline section with geometric and material properties.
@@ -37,6 +38,7 @@ class Pipe: # pylint: disable=too-many-arguments
         or layer values with shape (n_pipes, n_layers), ordered from steel
         outward. Requires a scalar or one-dimensional outer diameter and one
         row per pipe for multi-layer input. Use zero thickness for absent layers.
+        Omitted thicknesses represent an uncoated pipe.
     youngs_modulus : float or array-like, optional
         Young's modulus of the material. Default is 0.
     poisson_ratio : float or array-like, optional
@@ -49,8 +51,10 @@ class Pipe: # pylint: disable=too-many-arguments
         Density of the pipe content. Default is 0.
     coating_densities : array-like, optional
         Density per pipe with shape (n_pipes,), applied to every coating
-        layer, or layer densities with shape (n_pipes, n_layers).
-        May be omitted for geometry-only calculations; required for weights.
+        layer, or layer densities with shape (n_pipes, n_layers). A scalar
+        applies to all pipes and layers; a column (n_pipes, 1) is also accepted.
+        May be omitted for geometry-only calculations or zero-thickness
+        coatings; required for weights when any coating thickness is positive.
     """
     def __init__(
             self,
@@ -73,9 +77,12 @@ class Pipe: # pylint: disable=too-many-arguments
         self.wall_thickness = np.asarray(wall_thickness, dtype = float)
         self.corrosion_allowance = np.asarray(corrosion_allowance, dtype = float)
         self.coating_thicknesses = (
-            None if coating_thicknesses is None
+            np.zeros_like(self.outer_diameter) if coating_thicknesses is None
             else np.asarray(coating_thicknesses, dtype = float)
         )
+        if (np.any(~np.isfinite(self.coating_thicknesses))
+                or np.any(self.coating_thicknesses < 0)):
+            raise ValueError("Coating thicknesses must be finite and non-negative.")
         self.youngs_modulus = np.asarray(youngs_modulus, dtype = float)
         self.poisson_ratio = np.asarray(poisson_ratio, dtype = float)
         self.water_density = np.asarray(water_density, dtype = float)
@@ -89,20 +96,29 @@ class Pipe: # pylint: disable=too-many-arguments
     def _coating_thickness_layers(self):
         """Return coating thicknesses with an explicit final layer axis."""
         if self.coating_thicknesses.ndim == 0:
-            return self.coating_thicknesses.reshape(1, 1)
+            return self.coating_thicknesses.reshape(1)
         if self.coating_thicknesses.ndim == 1:
             return self.coating_thicknesses[..., np.newaxis]
         return self.coating_thicknesses
 
     def _coating_density_layers(self):
         """Return coating densities broadcast to the coating-area shape."""
+        if self.coating_densities is None:
+            if np.any(self.coating_thicknesses > 0):
+                raise ValueError("Coating densities are required for coated-pipe weights.")
+            return np.zeros_like(self.coating_areas())
+
+        densities = self.coating_densities
+        if np.any(~np.isfinite(densities)) or np.any(densities < 0):
+            raise ValueError("Coating densities must be finite and non-negative.")
         if self.coating_thicknesses.ndim <= 1:
+            if densities.ndim == 2 and densities.shape[-1] == 1:
+                densities = np.squeeze(densities, axis=-1)
             return np.broadcast_to(
-                self.coating_densities,
+                densities,
                 self.total_coating_area().shape,
             )
 
-        densities = self.coating_densities
         if densities.ndim == 1:
             densities = densities[..., np.newaxis]
         return np.broadcast_to(densities, self.coating_thicknesses.shape)
@@ -128,6 +144,31 @@ class Pipe: # pylint: disable=too-many-arguments
         array([0.0097, 0.0129])
         """
         return self.wall_thickness - self.corrosion_allowance
+
+    def total_coating_thickness(self):
+        """
+        Calculate the combined radial coating thickness.
+
+        Returns
+        -------
+        total_coating_thickness : np.ndarray
+            Sum of the layer thicknesses per pipe.
+
+        Examples
+        --------
+        >>> coating_thicknesses = [
+        ...     [0.0003, 0.0002, 0.006, 0.0120, 0.006],
+        ...     [0.0003, 0.0002, 0.006, 0.0615, 0.006]
+        ... ]
+        >>> pipe = Pipe(
+        ...     coating_thicknesses=coating_thicknesses
+        ... )
+        >>> pipe.total_coating_thickness()
+        array([0.0245, 0.074 ])
+        >>> Pipe(coating_thicknesses=[0.0032, 0.0032]).total_coating_thickness()
+        array([0.0032, 0.0032])
+        """
+        return np.sum(self._coating_thickness_layers(), axis=-1)
 
     def outer_diameter_to_wall_thickness_ratio(self):
         """
@@ -195,31 +236,31 @@ class Pipe: # pylint: disable=too-many-arguments
         """
         return self.outer_diameter - 2.0 * self.wall_thickness
 
-    def outer_wall_radius(self):
+    def outer_radius(self):
         """
         Calculate the radius at the outer surface of the steel pipe wall.
 
         Returns
         -------
-        outer_wall_radius : np.ndarray
+        outer_radius : np.ndarray
             Outer radius of the steel pipe.
 
         Examples
         --------
         >>> outer_diameter = [0.2731, 0.3239]
         >>> pipe = Pipe(outer_diameter=outer_diameter)
-        >>> pipe.outer_wall_radius()
+        >>> pipe.outer_radius()
         array([0.13655, 0.16195])
         """
         return self.outer_diameter / 2.0
 
-    def mid_wall_radius(self):
+    def mid_radius(self):
         """
         Calculate the radius at the middle of the pipe wall.
 
         Returns
         -------
-        mid_wall_radius : np.ndarray
+        mid_radius : np.ndarray
             Radius at the middle of the pipe wall.
 
         Examples
@@ -230,18 +271,18 @@ class Pipe: # pylint: disable=too-many-arguments
         ...     outer_diameter=outer_diameter,
         ...     wall_thickness=wall_thickness
         ... )
-        >>> pipe.mid_wall_radius()
+        >>> pipe.mid_radius()
         array([0.1302, 0.154 ])
         """
         return self.mid_diameter() / 2.0
 
-    def inner_wall_radius(self):
+    def inner_radius(self):
         """
         Calculate the radius at the inner surface of the pipe wall.
 
         Returns
         -------
-        inner_wall_radius : np.ndarray
+        inner_radius : np.ndarray
             Inner radius of the pipe.
 
         Examples
@@ -252,35 +293,10 @@ class Pipe: # pylint: disable=too-many-arguments
         ...     outer_diameter=outer_diameter,
         ...     wall_thickness=wall_thickness
         ... )
-        >>> pipe.inner_wall_radius()
+        >>> pipe.inner_radius()
         array([0.12385, 0.14605])
         """
         return self.inner_diameter() / 2.0
-
-    def total_coating_thickness(self):
-        """
-        Calculate the combined radial coating thickness.
-
-        Returns
-        -------
-        total_coating_thickness : np.ndarray or np.float64
-            Sum of the layer thicknesses per pipe.
-
-        Examples
-        --------
-        >>> coating_thicknesses = [
-        ...     [0.0003, 0.0002, 0.006, 0.0120, 0.006],
-        ...     [0.0003, 0.0002, 0.006, 0.0615, 0.006]
-        ... ]
-        >>> pipe = Pipe(
-        ...     coating_thicknesses=coating_thicknesses
-        ... )
-        >>> pipe.total_coating_thickness()
-        array([0.0245, 0.074 ])
-        >>> Pipe(coating_thicknesses=[0.0032, 0.0032]).total_coating_thickness()
-        array([0.0032, 0.0032])
-        """
-        return np.sum(self._coating_thickness_layers(), axis=-1)
 
     def total_outer_diameter(self):
         """
@@ -619,7 +635,7 @@ class Pipe: # pylint: disable=too-many-arguments
         >>> pipe.section_modulus()
         array([0.000677..., 0.001187...])
         """
-        return self.area_moment_inertia() / self.mid_wall_radius()
+        return self.area_moment_inertia() / self.mid_radius()
 
     def equivalent_coating_density(self):
         """
@@ -634,7 +650,8 @@ class Pipe: # pylint: disable=too-many-arguments
         Raises
         ------
         ValueError
-            If total coating area is zero or multi-layer densities are missing.
+            If any pipe has zero coating area, or densities are missing,
+            non-finite, negative, or incompatible with the coating shape.
 
         Examples
         --------
@@ -661,14 +678,16 @@ class Pipe: # pylint: disable=too-many-arguments
         ... ).equivalent_coating_density()
         array([1000., 1200.])
         """
+        total_area = self.total_coating_area()
+        if np.any(total_area <= 0):
+            raise ValueError("Equivalent coating density requires positive coating area.")
         if self.coating_thicknesses.ndim <= 1:
             return self._coating_density_layers().copy()
 
         areas = self.coating_areas()
-        total_area = self.total_coating_area()
         densities = self._coating_density_layers()
         weighted_area = np.sum(densities * areas, axis=-1)
-        return (weighted_area / total_area).reshape(self.outer_diameter.shape)
+        return weighted_area / total_area
 
     def steel_weight(self):
         """
@@ -703,7 +722,8 @@ class Pipe: # pylint: disable=too-many-arguments
         Raises
         ------
         ValueError
-            If multi-layer coatings were supplied without layer densities.
+            If positive coating thicknesses were supplied without densities,
+            or densities are non-finite, negative, or incompatible.
 
         Examples
         --------
@@ -748,7 +768,8 @@ class Pipe: # pylint: disable=too-many-arguments
         Raises
         ------
         ValueError
-            If multi-layer coatings were supplied without layer densities.
+            If positive coating thicknesses were supplied without densities,
+            or densities are non-finite, negative, or incompatible.
 
         Examples
         --------
@@ -772,7 +793,7 @@ class Pipe: # pylint: disable=too-many-arguments
         weights = self.coating_weights()
         if self.coating_thicknesses.ndim <= 1:
             return weights
-        return np.sum(weights, axis=-1).reshape(self.outer_diameter.shape)
+        return np.sum(weights, axis=-1)
 
     def content_weight(self):
         """
@@ -867,3 +888,123 @@ class Pipe: # pylint: disable=too-many-arguments
             + self.content_weight()
             - self.water_displaced_weight()
         )
+
+    def mass(self):
+        """
+        Calculate total mass per unit length.
+
+        Includes steel, coatings, and contents, but not hydrodynamic added mass.
+
+        Returns
+        -------
+        mass : np.ndarray or np.float64
+            Mass per unit length.
+
+        Examples
+        --------
+        >>> outer_diameter = [0.2731, 0.3239]
+        >>> wall_thickness = [0.0127, 0.0159]
+        >>> coating_thicknesses = [
+        ...     [0.0003, 0.0002, 0.006, 0.0120, 0.006],
+        ...     [0.0003, 0.0002, 0.006, 0.0615, 0.006]
+        ... ]
+        >>> steel_density = [7850.0, 7850.0]
+        >>> content_density = [1025.0, 1025.0]
+        >>> coating_densities = [
+        ...     [1500, 900, 900, 650, 900],
+        ...     [1500, 900, 900, 650, 900]
+        ... ]
+        >>> pipe = Pipe(
+        ...     outer_diameter=outer_diameter,
+        ...     wall_thickness=wall_thickness,
+        ...     coating_thicknesses=coating_thicknesses,
+        ...     steel_density=steel_density,
+        ...     content_density=content_density,
+        ...     coating_densities=coating_densities,
+        ... )
+        >>> pipe.mass()
+        array([148.91106158, 253.65213921])
+        """
+        mass = (
+            self.steel_weight() + self.total_coating_weight() + self.content_weight()
+        ) / 9.807
+        return mass
+
+    def specific_mass(self):
+        """
+        Calculate total mass per unit length divided by total outer area.
+
+        Includes steel, coatings, and contents, but not hydrodynamic added mass.
+
+        Returns
+        -------
+        specific_mass : np.ndarray or np.float64
+            Equivalent density.
+
+        Examples
+        --------
+        >>> outer_diameter = [0.2731, 0.3239]
+        >>> wall_thickness = [0.0127, 0.0159]
+        >>> coating_thicknesses = [
+        ...     [0.0003, 0.0002, 0.006, 0.0120, 0.006],
+        ...     [0.0003, 0.0002, 0.006, 0.0615, 0.006]
+        ... ]
+        >>> steel_density = [7850.0, 7850.0]
+        >>> content_density = [1025.0, 1025.0]
+        >>> coating_densities = [
+        ...     [1500, 900, 900, 650, 900],
+        ...     [1500, 900, 900, 650, 900]
+        ... ]
+        >>> pipe = Pipe(
+        ...     outer_diameter=outer_diameter,
+        ...     wall_thickness=wall_thickness,
+        ...     coating_thicknesses=coating_thicknesses,
+        ...     steel_density=steel_density,
+        ...     content_density=content_density,
+        ...     coating_densities=coating_densities,
+        ... )
+        >>> pipe.specific_mass()
+        array([1827.49260687, 1450.26943219])
+        """
+        return self.mass() / self.total_outer_area()
+
+    def specific_mass_ratio(self):
+        """
+        Calculate specific mass divided by water density.
+
+        Includes steel, coatings, and contents, but not hydrodynamic added mass.
+        Equivalent to pipe mass divided by displaced-water mass per unit length.
+
+        Returns
+        -------
+        specific_mass_ratio : np.ndarray or np.float64
+            Dimensionless mass ratio, one value per pipe.
+
+        Examples
+        --------
+        >>> outer_diameter = [0.2731, 0.3239]
+        >>> wall_thickness = [0.0127, 0.0159]
+        >>> coating_thicknesses = [
+        ...     [0.0003, 0.0002, 0.006, 0.0120, 0.006],
+        ...     [0.0003, 0.0002, 0.006, 0.0615, 0.006]
+        ... ]
+        >>> water_density = [1025.0, 1025.0]
+        >>> steel_density = [7850.0, 7850.0]
+        >>> content_density = [1025.0, 1025.0]
+        >>> coating_densities = [
+        ...     [1500, 900, 900, 650, 900],
+        ...     [1500, 900, 900, 650, 900]
+        ... ]
+        >>> pipe = Pipe(
+        ...     outer_diameter=outer_diameter,
+        ...     wall_thickness=wall_thickness,
+        ...     coating_thicknesses=coating_thicknesses,
+        ...     water_density=water_density,
+        ...     steel_density=steel_density,
+        ...     content_density=content_density,
+        ...     coating_densities=coating_densities,
+        ... )
+        >>> pipe.specific_mass_ratio()
+        array([1.78291962, 1.41489701])
+        """
+        return self.specific_mass() / self.water_density

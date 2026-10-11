@@ -22,9 +22,10 @@ References
    :maxdepth: 4
 
    linepipe_tools
-   dnv_tools
+   limit_state_tools
    lateral_buckling_tools
    upheaval_buckling_tools
    pipe_soil_interaction_tools
+   pipe_soil_interaction_dynamic_tools
    oos_tools
    abaquspy

@@ -14,7 +14,7 @@ def run_doctests():
         optionflags=doctest.NORMALIZE_WHITESPACE | doctest.ELLIPSIS
     )
     result2 = doctest.testmod(
-        ss.dnv_tools, verbose=False,
+        ss.limit_state_tools, verbose=False,
         optionflags=doctest.NORMALIZE_WHITESPACE | doctest.ELLIPSIS
     )
     result3 = doctest.testmod(
@@ -22,11 +22,15 @@ def run_doctests():
         optionflags=doctest.NORMALIZE_WHITESPACE | doctest.ELLIPSIS
     )
     result4 = doctest.testmod(
-        ss.pipe_soil_interaction_tools, verbose=False,
+        ss.upheaval_buckling_tools, verbose=False,
         optionflags=doctest.NORMALIZE_WHITESPACE | doctest.ELLIPSIS
     )
     result5 = doctest.testmod(
-        ss.upheaval_buckling_tools, verbose=False,
+        ss.pipe_soil_interaction_tools, verbose=False,
+        optionflags=doctest.NORMALIZE_WHITESPACE | doctest.ELLIPSIS
+    )
+    result6 = doctest.testmod(
+        ss.pipe_soil_interaction_dynamic_tools, verbose=False,
         optionflags=doctest.NORMALIZE_WHITESPACE | doctest.ELLIPSIS
     )
     total_attempted = (
@@ -34,14 +38,16 @@ def run_doctests():
         result2.attempted +
         result3.attempted +
         result4.attempted +
-        result5.attempted
+        result5.attempted +
+        result6.attempted
     )
     total_failed = (
         result1.failed +
         result2.failed +
         result3.failed +
         result4.failed +
-        result5.failed
+        result5.failed +
+        result6.failed
     )
     total_passed = total_attempted - total_failed
     print(

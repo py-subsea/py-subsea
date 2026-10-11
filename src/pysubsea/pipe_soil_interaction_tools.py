@@ -18,6 +18,9 @@ models for a given pipe and soil configuration.
 
 import numpy as np
 
+from .pipe_soil_interaction_dynamic_tools import PSIDynamic
+
+
 class PSI: # pylint: disable=too-many-arguments
     """
     Class for calculating the capacity of soils using various models
@@ -30,12 +33,12 @@ class PSI: # pylint: disable=too-many-arguments
     surface_roughness : str, optional
         Surface roughness of the pipe ('Smooth' or 'Rough').
     undrained_shear_strength_depth_array : array_like, optional
-        Per-pipe depth values, in m, defining the undrained shear strength profile.
+        Per-pipe depth values defining the undrained shear strength profile.
     undrained_shear_strength_value_array : array_like, optional
-        Per-pipe undrained shear strength values, in Pa, matching
+        Per-pipe undrained shear strength values matching
         ``undrained_shear_strength_depth_array``.
     submerged_unit_weight : float, optional
-        Submerged unit weight of the soil, gamma', in N/m3.
+        Submerged unit weight of the soil, gamma'.
     """
     def __init__(
             self,
@@ -199,22 +202,13 @@ class PSI: # pylint: disable=too-many-arguments
         """
         Calculate vertical penetration resistance using undrained Model 1.
 
-        The calculation follows the bearing-capacity formulation in the attached
-        PDF. For each pipe, the method evaluates depths at 0.001 m spacing from
-        0.001 m to the maximum depth of ``undrained_shear_strength_depth_array``
-        and prepends the zero-depth point to the returned arrays. The
-        reference shear strength is linearly interpolated at ``zsu,0`` from the
-        profile defined by ``undrained_shear_strength_depth_array`` and
-        ``undrained_shear_strength_value_array``, and the buoyancy contribution
-        uses the supplied submerged unit weight.
-
         Returns
         -------
         depth_arrays : np.ndarray
             Depth arrays with shape ``(n_pipes, n_depths)``.
         vertical_bearing_capacity_arrays : np.ndarray
             Vertical penetration resistance arrays with shape
-            ``(n_pipes, n_depths)``, in N/m.
+            ``(n_pipes, n_depths)``
         Examples
         --------
         >>> psi = PSI(
@@ -306,23 +300,13 @@ class PSI: # pylint: disable=too-many-arguments
         """
         Calculate vertical penetration resistance using undrained Model 2.
 
-        Model 2 follows the alternative formulation in the attached PDF. It
-        combines the minimum of the two resistance-factor terms with the soil
-        buoyancy contribution. For each pipe, the method evaluates depths at
-        0.001 m spacing from 0.001 m to the maximum depth of
-        ``undrained_shear_strength_depth_array`` and prepends the zero-depth
-        point to the returned arrays. The shear strength at the pipe invert is
-        linearly interpolated from the profile defined by
-        ``undrained_shear_strength_depth_array`` and
-        ``undrained_shear_strength_value_array``.
-
         Returns
         -------
         depth_arrays : np.ndarray
             Depth arrays with shape ``(n_pipes, n_depths)``.
         vertical_bearing_capacity_arrays : np.ndarray
             Vertical penetration resistance arrays with shape
-            ``(n_pipes, n_depths)``, in N/m.
+            ``(n_pipes, n_depths)``
 
         Examples
         --------
@@ -382,3 +366,4 @@ class PSI: # pylint: disable=too-many-arguments
             )
 
         return np.array(depth_arrays), np.array(vertical_bearing_capacity_arrays)
+

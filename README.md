@@ -13,3 +13,24 @@ Useful project links:
 * Documentation: https://py-subsea.github.io/py-subsea
 * Source code: https://github.com/py-subsea/py-subsea
 * Bug reports: https://github.com/py-subsea/py-subsea/issues
+
+## Installation
+
+Install PySubsea with its required NumPy and SciPy dependencies:
+
+```powershell
+python -m pip install pysubsea
+```
+
+For an editable installation from a local checkout:
+
+```powershell
+python -m pip install -e .
+```
+
+Optional dependencies are available for running the examples and building
+the documentation:
+
+```powershell
+python -m pip install -e ".[examples,docs]"
+```

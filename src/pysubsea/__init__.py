@@ -4,9 +4,9 @@ Library of pipeline calculations
 
 
 from .linepipe_tools import Pipe
-from .dnv_tools import DNVGeneral
-from .dnv_tools import DNVLimitStates
-from .dnv_tools import DNVSpanning
+from .limit_state_tools import MaterialStrength
+from .limit_state_tools import LimitStates
+from .pipe_soil_interaction_dynamic_tools import PSIDynamic
 from .lateral_buckling_tools import LBForceDistributions
 from .lateral_buckling_tools import LBOOSDistributions
 from .lateral_buckling_tools import LBSoilDistributions
@@ -21,9 +21,9 @@ from .upheaval_buckling_tools import PropType
 # __all__ for explicit API exposure:
 __all__ = [
     "Pipe",
-    "DNVGeneral",
-    "DNVLimitStates",
-    "DNVSpanning",
+    "MaterialStrength",
+    "LimitStates",
+    "PSIDynamic",
     "LBForceDistributions",
     "LBOOSDistributions",
     "LBSoilDistributions",

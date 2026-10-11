@@ -1,6 +1,6 @@
 Metadata-Version: 2.4
 Name: pysubsea
-Version: 0.1.8
+Version: 0.1.9
 Summary: Package for subsea pipelines and risers design in Python
 Author-email: Subsea Energies <info@subseaenergies.com>
 License-Expression: MIT
@@ -16,6 +16,15 @@ Classifier: Topic :: Scientific/Engineering
 Requires-Python: >=3.10
 Description-Content-Type: text/markdown
 License-File: LICENSE
+Requires-Dist: numpy
+Requires-Dist: scipy
+Provides-Extra: examples
+Requires-Dist: pandas; extra == "examples"
+Requires-Dist: matplotlib; extra == "examples"
+Requires-Dist: openpyxl; extra == "examples"
+Provides-Extra: docs
+Requires-Dist: Sphinx; extra == "docs"
+Requires-Dist: pydata-sphinx-theme; extra == "docs"
 Dynamic: license-file
 
 # PySubsea
@@ -33,3 +42,24 @@ Useful project links:
 * Documentation: https://py-subsea.github.io/py-subsea
 * Source code: https://github.com/py-subsea/py-subsea
 * Bug reports: https://github.com/py-subsea/py-subsea/issues
+
+## Installation
+
+Install PySubsea with its required NumPy and SciPy dependencies:
+
+```powershell
+python -m pip install pysubsea
+```
+
+For an editable installation from a local checkout:
+
+```powershell
+python -m pip install -e .
+```
+
+Optional dependencies are available for running the examples and building
+the documentation:
+
+```powershell
+python -m pip install -e ".[examples,docs]"
+```

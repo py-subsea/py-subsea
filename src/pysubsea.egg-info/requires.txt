@@ -1,0 +1,11 @@
+numpy
+scipy
+
+[docs]
+Sphinx
+pydata-sphinx-theme
+
+[examples]
+pandas
+matplotlib
+openpyxl
